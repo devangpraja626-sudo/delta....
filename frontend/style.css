@@ -1,0 +1,1736 @@
+/* =========================================
+   DELTA — PREMIUM BLACK & SILVER
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --black: #050505;
+    --black-2: #0a0a0a;
+    --black-3: #111111;
+
+    --silver: #d8d8d8;
+    --silver-light: #f5f5f5;
+    --silver-dark: #777777;
+
+    --border: rgba(255, 255, 255, 0.12);
+
+    --font-display: "Space Grotesk", sans-serif;
+    --font-body: "Inter", sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--black);
+    color: var(--silver-light);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+button,
+input {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* =========================================
+   BACKGROUND
+========================================= */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,0.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,0.025) 1px,
+            transparent 1px
+        );
+
+    background-size: 80px 80px;
+
+    mask-image: linear-gradient(
+        to bottom,
+        black,
+        transparent 80%
+    );
+
+    z-index: -3;
+}
+
+.noise {
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+
+    opacity: 0.035;
+
+    z-index: 50;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+.ambient {
+    position: fixed;
+
+    width: 500px;
+    height: 500px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.035);
+
+    filter: blur(120px);
+
+    pointer-events: none;
+
+    z-index: -2;
+}
+
+.ambient-one {
+    top: 5%;
+    right: -250px;
+}
+
+.ambient-two {
+    bottom: 10%;
+    left: -300px;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 82px;
+
+    padding: 0 6vw;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    z-index: 100;
+
+    background: rgba(5,5,5,0.72);
+
+    backdrop-filter: blur(18px);
+
+    border-bottom: 1px solid transparent;
+
+    transition: 0.3s ease;
+}
+
+.header.scrolled {
+    border-bottom-color: var(--border);
+    background: rgba(5,5,5,0.92);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    font-family: var(--font-display);
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    letter-spacing: 4px;
+}
+
+.brand-mark {
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #aaa;
+
+    color: white;
+
+    font-size: 20px;
+
+    transform: rotate(0deg);
+
+    box-shadow:
+        0 0 20px rgba(255,255,255,0.08);
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 42px;
+}
+
+.nav a {
+    color: #999;
+
+    font-size: 14px;
+
+    transition: 0.25s ease;
+}
+
+.nav a:hover {
+    color: white;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.text-button {
+    border: 0;
+
+    background: transparent;
+
+    color: #aaa;
+
+    font-size: 14px;
+}
+
+.text-button:hover {
+    color: white;
+}
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.button {
+    border: 1px solid transparent;
+
+    min-height: 48px;
+
+    padding: 0 22px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition:
+        transform 0.25s ease,
+        background 0.25s ease,
+        border 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.button span {
+    font-size: 18px;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+}
+
+.button-light {
+    background: var(--silver-light);
+    color: #050505;
+}
+
+.button-light:hover {
+    background: white;
+
+    box-shadow:
+        0 12px 40px rgba(255,255,255,0.12);
+}
+
+.button-outline {
+    border-color: #444;
+
+    background: rgba(255,255,255,0.02);
+
+    color: #ddd;
+}
+
+.button-outline:hover {
+    border-color: #888;
+
+    background: rgba(255,255,255,0.05);
+}
+
+.button-large {
+    min-height: 58px;
+
+    padding: 0 28px;
+
+    font-size: 15px;
+}
+
+.menu-button {
+    display: none;
+
+    background: transparent;
+
+    border: 0;
+
+    color: white;
+
+    font-size: 25px;
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.hero {
+    min-height: 100vh;
+
+    padding:
+        150px 7vw
+        100px;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(420px, 0.9fr);
+
+    align-items: center;
+
+    gap: 40px;
+}
+
+.hero-copy {
+    max-width: 760px;
+}
+
+.eyebrow,
+.section-tag {
+    color: #888;
+
+    font-family: var(--font-display);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+.eyebrow {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 30px;
+}
+
+.pulse {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #ddd;
+
+    box-shadow:
+        0 0 14px rgba(255,255,255,0.8);
+}
+
+.hero h1 {
+    font-family: var(--font-display);
+
+    font-size:
+        clamp(55px, 6.5vw, 100px);
+
+    line-height: 0.98;
+
+    letter-spacing: -5px;
+
+    font-weight: 600;
+
+    margin-bottom: 34px;
+}
+
+.hero h1 em {
+    font-style: normal;
+
+    color: #777;
+
+    background:
+        linear-gradient(
+            110deg,
+            #666,
+            #eee,
+            #777
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+}
+
+.hero-description {
+    max-width: 620px;
+
+    color: #8d8d8d;
+
+    font-size: 17px;
+
+    line-height: 1.8;
+
+    margin-bottom: 38px;
+}
+
+.hero-description strong {
+    color: #ddd;
+}
+
+.hero-actions {
+    display: flex;
+
+    gap: 14px;
+
+    flex-wrap: wrap;
+
+    margin-bottom: 52px;
+}
+
+.stats {
+    display: flex;
+
+    gap: 55px;
+
+    padding-top: 28px;
+
+    border-top: 1px solid var(--border);
+
+    max-width: 650px;
+}
+
+.stats div {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.stats strong {
+    font-family: var(--font-display);
+
+    font-size: 27px;
+
+    color: white;
+}
+
+.stats span {
+    color: #666;
+
+    font-size: 11px;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================
+   HERO ART
+========================================= */
+
+.hero-art {
+    position: relative;
+
+    width: min(620px, 100%);
+
+    aspect-ratio: 1;
+
+    margin: auto;
+
+    display: grid;
+
+    place-items: center;
+}
+
+.orbit {
+    position: absolute;
+
+    border: 1px solid rgba(255,255,255,0.12);
+
+    border-radius: 50%;
+
+    animation: rotate 24s linear infinite;
+}
+
+.orbit-a {
+    width: 86%;
+    height: 86%;
+
+    transform: rotate(20deg);
+}
+
+.orbit-b {
+    width: 67%;
+    height: 67%;
+
+    border-style: dashed;
+
+    animation-duration: 18s;
+
+    animation-direction: reverse;
+}
+
+.orbit-c {
+    width: 47%;
+    height: 47%;
+
+    border-color: rgba(255,255,255,0.22);
+
+    animation-duration: 12s;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.globe {
+    position: relative;
+
+    width: 43%;
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            #e5e5e5,
+            #777 20%,
+            #222 55%,
+            #050505 78%
+        );
+
+    box-shadow:
+        0 0 80px rgba(255,255,255,0.12),
+        inset -25px -20px 40px rgba(0,0,0,0.8);
+}
+
+.globe-grid {
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    opacity: 0.35;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 20px,
+            rgba(255,255,255,0.25) 21px 22px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 20px,
+            rgba(255,255,255,0.2) 21px 22px
+        );
+
+    clip-path: circle(50%);
+}
+
+.globe-shine {
+    position: absolute;
+
+    width: 40%;
+    height: 40%;
+
+    top: 8%;
+    left: 14%;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.25);
+
+    filter: blur(20px);
+}
+
+.delta-symbol {
+    position: absolute;
+
+    z-index: 5;
+
+    font-family: Georgia, serif;
+
+    font-size: clamp(70px, 10vw, 145px);
+
+    font-weight: 400;
+
+    color: #f5f5f5;
+
+    text-shadow:
+        0 0 30px rgba(255,255,255,0.25),
+        0 0 80px rgba(255,255,255,0.08);
+
+    animation: floatDelta 5s ease-in-out infinite;
+}
+
+@keyframes floatDelta {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+
+/* =========================================
+   FLOATING CARDS
+========================================= */
+
+.floating-card {
+    position: absolute;
+
+    z-index: 10;
+
+    min-width: 185px;
+
+    padding: 13px 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    background:
+        rgba(15,15,15,0.82);
+
+    border: 1px solid rgba(255,255,255,0.15);
+
+    backdrop-filter: blur(15px);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.5);
+
+    transition: transform 0.2s ease;
+}
+
+.floating-card b {
+    display: block;
+
+    font-family: var(--font-display);
+
+    font-size: 13px;
+
+    color: white;
+}
+
+.floating-card small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #777;
+
+    font-size: 10px;
+}
+
+.mini-icon {
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #555;
+
+    color: #ddd;
+
+    font-size: 15px;
+}
+
+.card-founder {
+    top: 17%;
+    left: 2%;
+}
+
+.card-investor {
+    right: 0;
+    top: 35%;
+}
+
+.card-consultant {
+    bottom: 13%;
+    left: 10%;
+}
+
+
+/* =========================================
+   VISION
+========================================= */
+
+.vision {
+    width: 100%;
+
+    min-height: 150px;
+
+    padding: 30px 7vw;
+
+    display: grid;
+
+    grid-template-columns: auto 1fr auto;
+
+    align-items: center;
+
+    gap: 30px;
+
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.025),
+            transparent
+        );
+}
+
+.vision > span {
+    color: #777;
+
+    font-size: 20px;
+}
+
+.vision div {
+    text-align: center;
+}
+
+.vision small {
+    color: #666;
+
+    font-size: 10px;
+
+    letter-spacing: 3px;
+}
+
+.vision h2 {
+    margin-top: 5px;
+
+    font-family: var(--font-display);
+
+    font-size: clamp(22px, 3vw, 40px);
+
+    letter-spacing: -1px;
+}
+
+
+/* =========================================
+   INTRO
+========================================= */
+
+.intro {
+    padding:
+        160px 7vw
+        110px;
+
+    text-align: center;
+}
+
+.intro .section-tag {
+    margin-bottom: 28px;
+}
+
+.intro h2 {
+    font-family: var(--font-display);
+
+    font-size:
+        clamp(42px, 6vw, 80px);
+
+    line-height: 1.05;
+
+    letter-spacing: -4px;
+
+    font-weight: 600;
+}
+
+.intro h2 em {
+    font-style: normal;
+
+    color: #666;
+}
+
+.intro p {
+    max-width: 600px;
+
+    margin: 30px auto 0;
+
+    color: #777;
+
+    font-size: 16px;
+}
+
+
+/* =========================================
+   ROLES
+========================================= */
+
+.roles {
+    padding:
+        40px 7vw
+        150px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 18px;
+}
+
+.role-card {
+    min-height: 450px;
+
+    padding: 32px;
+
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+
+    border: 1px solid var(--border);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.045),
+            rgba(255,255,255,0.01)
+        );
+
+    transition:
+        transform 0.3s ease,
+        border 0.3s ease;
+}
+
+.role-card:hover {
+    transform: translateY(-8px);
+
+    border-color: rgba(255,255,255,0.3);
+}
+
+.role-card.featured {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.08),
+            rgba(255,255,255,0.015)
+        );
+}
+
+.role-top {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 70px;
+}
+
+.role-number {
+    color: #555;
+
+    font-family: var(--font-display);
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+}
+
+.role-icon {
+    width: 46px;
+    height: 46px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #444;
+
+    color: #ddd;
+
+    font-size: 20px;
+}
+
+.role-card h3 {
+    font-family: var(--font-display);
+
+    font-size: 34px;
+
+    margin-bottom: 14px;
+}
+
+.role-card p {
+    color: #777;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+.chips {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 25px;
+}
+
+.chips span {
+    padding: 6px 9px;
+
+    border: 1px solid #252525;
+
+    color: #777;
+
+    font-size: 9px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+.role-card button {
+    margin-top: auto;
+
+    padding-top: 30px;
+
+    border: 0;
+
+    border-top: 1px solid var(--border);
+
+    background: transparent;
+
+    color: #ddd;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.role-card button span {
+    margin-left: 10px;
+
+    font-size: 17px;
+
+    transition: 0.2s;
+}
+
+.role-card button:hover span {
+    margin-left: 17px;
+}
+
+
+/* =========================================
+   ABOUT
+========================================= */
+
+.about {
+    padding:
+        130px 7vw;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 100px;
+
+    border-top: 1px solid var(--border);
+}
+
+.about h2 {
+    margin-top: 28px;
+
+    font-family: var(--font-display);
+
+    font-size:
+        clamp(42px, 5vw, 68px);
+
+    line-height: 1;
+
+    letter-spacing: -3px;
+}
+
+.about h2 em {
+    color: #666;
+
+    font-style: normal;
+}
+
+.about-copy {
+    padding-top: 45px;
+}
+
+.about-copy p {
+    color: #888;
+
+    font-size: 17px;
+
+    line-height: 1.9;
+
+    margin-bottom: 28px;
+
+    max-width: 570px;
+}
+
+
+/* =========================================
+   CTA
+========================================= */
+
+.cta {
+    margin: 80px 7vw 130px;
+
+    padding: 55px;
+
+    display: grid;
+
+    grid-template-columns: auto 1fr auto;
+
+    align-items: center;
+
+    gap: 35px;
+
+    border: 1px solid #333;
+
+    background:
+        radial-gradient(
+            circle at 15% 50%,
+            rgba(255,255,255,0.08),
+            transparent 35%
+        ),
+        #0b0b0b;
+}
+
+.cta-mark {
+    width: 70px;
+    height: 70px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #555;
+
+    font-family: Georgia, serif;
+
+    font-size: 40px;
+
+    color: white;
+}
+
+.cta h2 {
+    margin-top: 10px;
+
+    font-family: var(--font-display);
+
+    font-size:
+        clamp(30px, 4vw, 55px);
+
+    letter-spacing: -2px;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+    padding:
+        40px 7vw
+        45px;
+
+    border-top: 1px solid var(--border);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 30px;
+
+    color: #555;
+
+    font-size: 11px;
+}
+
+.footer-brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.footer-brand .brand-mark {
+    width: 28px;
+    height: 28px;
+
+    font-size: 15px;
+}
+
+.footer-brand b {
+    color: #aaa;
+
+    letter-spacing: 3px;
+}
+
+.footer-brand span:last-child {
+    margin-left: 10px;
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 1000;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-backdrop {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        rgba(0,0,0,0.82);
+
+    backdrop-filter: blur(10px);
+}
+
+.modal-box {
+    position: relative;
+
+    z-index: 2;
+
+    width: min(510px, 100%);
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    padding: 42px;
+
+    border: 1px solid #333;
+
+    background:
+        linear-gradient(
+            145deg,
+            #151515,
+            #080808
+        );
+
+    box-shadow:
+        0 40px 120px rgba(0,0,0,0.8);
+}
+
+.close {
+    position: absolute;
+
+    top: 18px;
+    right: 20px;
+
+    width: 35px;
+    height: 35px;
+
+    border: 1px solid #333;
+
+    background: transparent;
+
+    color: #aaa;
+
+    font-size: 22px;
+}
+
+.close:hover {
+    color: white;
+
+    border-color: #777;
+}
+
+.modal-box h2 {
+    margin-top: 15px;
+
+    font-family: var(--font-display);
+
+    font-size: 38px;
+
+    line-height: 1.05;
+
+    letter-spacing: -1.5px;
+}
+
+.modal-box > div > p,
+.modal-box form > p {
+    color: #777;
+
+    font-size: 14px;
+
+    margin: 12px 0 25px;
+}
+
+
+/* =========================================
+   ROLE SELECT
+========================================= */
+
+.role-select {
+    display: grid;
+
+    gap: 9px;
+
+    margin-top: 25px;
+}
+
+.role-select button {
+    display: grid;
+
+    grid-template-columns: 42px 1fr;
+
+    grid-template-rows: 1fr 1fr;
+
+    column-gap: 13px;
+
+    padding: 13px;
+
+    text-align: left;
+
+    border: 1px solid #272727;
+
+    background: #0d0d0d;
+
+    color: #aaa;
+
+    transition: 0.2s;
+}
+
+.role-select button > span {
+    grid-row: 1 / 3;
+
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #333;
+
+    color: #ddd;
+
+    font-size: 17px;
+}
+
+.role-select button b {
+    align-self: end;
+
+    color: #ddd;
+
+    font-family: var(--font-display);
+
+    font-size: 14px;
+}
+
+.role-select button small {
+    align-self: start;
+
+    color: #555;
+
+    font-size: 10px;
+}
+
+.role-select button:hover,
+.role-select button.selected {
+    border-color: #777;
+
+    background: #151515;
+}
+
+.selected {
+    min-height: 20px;
+
+    color: #777 !important;
+
+    margin: 15px 0 !important;
+}
+
+
+/* =========================================
+   FORMS
+========================================= */
+
+.hidden {
+    display: none !important;
+}
+
+label {
+    display: block;
+
+    margin-bottom: 18px;
+
+    color: #777;
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+input {
+    width: 100%;
+
+    display: block;
+
+    margin-top: 7px;
+
+    padding: 14px 15px;
+
+    border: 1px solid #303030;
+
+    outline: none;
+
+    background: #090909;
+
+    color: white;
+
+    font-size: 14px;
+
+    transition: 0.2s;
+}
+
+input:focus {
+    border-color: #888;
+
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,0.04);
+}
+
+.full {
+    width: 100%;
+
+    margin-top: 8px;
+}
+
+.full:disabled {
+    opacity: 0.35;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+.back-button {
+    border: 0;
+
+    background: transparent;
+
+    color: #666;
+
+    font-size: 12px;
+
+    margin-bottom: 25px;
+}
+
+.back-button:hover {
+    color: white;
+}
+
+.form-message {
+    min-height: 20px;
+
+    margin-top: 15px;
+
+    font-size: 12px;
+
+    color: #777;
+}
+
+.form-message.success {
+    color: #aaa;
+}
+
+.form-message.error {
+    color: #ddd;
+}
+
+
+/* =========================================
+   RESPONSIVE — TABLET
+========================================= */
+
+@media (max-width: 1050px) {
+
+    .header {
+        padding: 0 4vw;
+    }
+
+    .hero {
+        padding-left: 5vw;
+        padding-right: 5vw;
+
+        grid-template-columns:
+            1fr;
+
+        padding-top: 140px;
+    }
+
+    .hero-copy {
+        max-width: 850px;
+    }
+
+    .hero-art {
+        width: min(560px, 90vw);
+
+        margin-top: 30px;
+    }
+
+    .roles {
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+
+    .about {
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+}
+
+
+/* =========================================
+   RESPONSIVE — MOBILE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .header {
+        height: 70px;
+
+        padding: 0 20px;
+    }
+
+    .brand {
+        font-size: 17px;
+    }
+
+    .brand-mark {
+        width: 30px;
+        height: 30px;
+    }
+
+    .header-actions {
+        display: none;
+    }
+
+    .menu-button {
+        display: block;
+    }
+
+    .nav {
+        position: absolute;
+
+        top: 70px;
+        left: 15px;
+        right: 15px;
+
+        display: none;
+
+        flex-direction: column;
+
+        gap: 0;
+
+        padding: 10px;
+
+        border: 1px solid #292929;
+
+        background: #0b0b0b;
+    }
+
+    .nav.open {
+        display: flex;
+    }
+
+    .nav a {
+        width: 100%;
+
+        padding: 14px;
+
+        border-bottom: 1px solid #181818;
+    }
+
+    .hero {
+        padding:
+            120px 20px
+            70px;
+
+        min-height: auto;
+    }
+
+    .hero h1 {
+        font-size: clamp(47px, 14vw, 70px);
+
+        letter-spacing: -3px;
+    }
+
+    .hero-description {
+        font-size: 15px;
+    }
+
+    .hero-actions {
+        width: 100%;
+
+        flex-direction: column;
+    }
+
+    .hero-actions .button {
+        width: 100%;
+    }
+
+    .stats {
+        gap: 20px;
+
+        justify-content: space-between;
+    }
+
+    .stats strong {
+        font-size: 22px;
+    }
+
+    .stats span {
+        font-size: 9px;
+    }
+
+    .hero-art {
+        width: 100%;
+
+        margin-top: 30px;
+    }
+
+    .floating-card {
+        min-width: 145px;
+
+        padding: 9px;
+
+        transform: scale(0.8);
+    }
+
+    .card-founder {
+        left: -15px;
+    }
+
+    .card-investor {
+        right: -15px;
+    }
+
+    .card-consultant {
+        left: 0;
+        bottom: 5%;
+    }
+
+    .vision {
+        padding: 25px 20px;
+
+        gap: 12px;
+    }
+
+    .vision h2 {
+        font-size: 20px;
+    }
+
+    .vision > span {
+        font-size: 14px;
+    }
+
+    .intro {
+        padding:
+            100px 20px
+            70px;
+    }
+
+    .intro h2 {
+        font-size: 43px;
+
+        letter-spacing: -2.5px;
+    }
+
+    .roles {
+        padding:
+            20px
+            80px;
+
+        grid-template-columns: 1fr;
+    }
+
+    .role-card {
+        min-height: 420px;
+    }
+
+    .about {
+        padding:
+            80px 20px;
+
+        grid-template-columns: 1fr;
+
+        gap: 30px;
+    }
+
+    .about h2 {
+        font-size: 45px;
+    }
+
+    .about-copy {
+        padding-top: 0;
+    }
+
+    .about-copy p {
+        font-size: 15px;
+    }
+
+    .cta {
+        margin:
+            50px 20px
+            80px;
+
+        padding: 30px 22px;
+
+        grid-template-columns: 1fr;
+
+        gap: 22px;
+    }
+
+    .cta-mark {
+        width: 55px;
+        height: 55px;
+    }
+
+    .cta h2 {
+        font-size: 35px;
+    }
+
+    footer {
+        padding:
+            30px 20px;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        font-size: 10px;
+    }
+
+    .modal-box {
+        padding: 30px 22px;
+    }
+
+    .modal-box h2 {
+        font-size: 31px;
+    }
+}
+
+
+/* =========================================
+   SMALL PHONES
+========================================= */
+
+@media (max-width: 420px) {
+
+    .hero h1 {
+        font-size: 45px;
+    }
+
+    .hero-art {
+        transform: scale(0.92);
+    }
+
+    .stats {
+        gap: 12px;
+    }
+
+    .stats strong {
+        font-size: 19px;
+    }
+
+    .role-card {
+        padding: 25px;
+    }
+
+    .role-card h3 {
+        font-size: 30px;
+    }
+
+}
