@@ -21,7 +21,7 @@ const generateToken = (user) => {
 };
 
 
-/* ================= REGISTER ================= */
+/* ================ REGISTER ================ */
 
 const register = async (req, res) => {
 
