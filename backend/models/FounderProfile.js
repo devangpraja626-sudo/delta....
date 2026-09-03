@@ -9,85 +9,55 @@ const founderProfileSchema = new mongoose.Schema(
             unique: true
         },
 
-        profilePhoto: {
-            type: String,
-            default: ""
-        },
-
-        headline: {
-            type: String,
-            maxlength: 120,
-            default: ""
-        },
-
-        bio: {
-            type: String,
-            maxlength: 1000,
-            default: ""
-        },
-
-        location: {
-            type: String,
-            default: ""
-        },
-
-        skills: [{
-            type: String
-        }],
-
-        interests: [{
-            type: String
-        }],
-
         startupName: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        startupStage: {
+        idea: {
             type: String,
-            enum: [
-                "",
-                "idea",
-                "pre-seed",
-                "seed",
-                "early-stage",
-                "growth"
-            ],
+            trim: true,
             default: ""
         },
 
         industry: {
             type: String,
+            trim: true,
+            default: ""
+        },
+
+        stage: {
+            type: String,
+            trim: true,
+            default: ""
+        },
+
+        location: {
+            type: String,
+            trim: true,
             default: ""
         },
 
         website: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        lookingFor: [{
+        bio: {
             type: String,
-            enum: [
-                "cofounder",
-                "investor",
-                "consultant",
-                "employees",
-                "customers",
-                "partnerships",
-                "mentors"
-            ]
-        }]
+            trim: true,
+            maxlength: 2000,
+            default: ""
+        }
     },
-
     {
         timestamps: true
     }
 );
 
-module.exports =
-    mongoose.model(
-        "FounderProfile",
-        founderProfileSchema
-    );
+module.exports = mongoose.model(
+    "FounderProfile",
+    founderProfileSchema
+);
