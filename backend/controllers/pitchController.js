@@ -1,48 +1,60 @@
 const Pitch = require("../models/Pitch");
 
 
-/* ================= CREATE PITCH ================= */
+// ================= CREATE PITCH =================
 
 const createPitch = async (req, res) => {
-
     try {
 
-        if (req.user.role !== "founder") {
-
+        if (req.user.role !== "Founder") {
             return res.status(403).json({
                 success: false,
-                message:
-                    "Only founders can create pitches"
+                message: "Only founders can create pitches"
             });
         }
 
+        const {
+            title,
+            description,
+            industry,
+            stage,
+            fundingRequired,
+            website,
+            status
+        } = req.body;
 
-        const pitch =
-            await Pitch.create({
-
-                founder: req.user.id,
-
-                ...req.body
-
+        if (!title || !description) {
+            return res.status(400).json({
+                success: false,
+                message: "Title and description are required"
             });
+        }
 
+        const pitch = await Pitch.create({
+            founder: req.user.id,
+            title,
+            description,
+            industry,
+            stage,
+            fundingRequired,
+            website,
+            status: status || "Draft"
+        });
 
-        res.status(201).json({
-
+        return res.status(201).json({
             success: true,
-
-            message:
-                "Pitch created successfully",
-
+            message: "Pitch created successfully",
             pitch
-
         });
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Create pitch error:",
+            error
+        );
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Unable to create pitch"
         });
@@ -50,187 +62,150 @@ const createPitch = async (req, res) => {
 };
 
 
-/* ================= GET ALL PUBLISHED PITCHES ================= */
-
-const getPitches = async (req, res) => {
-
-    try {
-
-        const pitches =
-            await Pitch
-                .find({
-                    isPublished: true
-                })
-                .populate(
-                    "founder",
-                    "name email"
-                )
-                .sort({
-                    createdAt: -1
-                });
-
-
-        res.json({
-
-            success: true,
-
-            count: pitches.length,
-
-            pitches
-
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to load pitches"
-        });
-    }
-};
-
-
-/* ================= MY PITCHES ================= */
+// ================= GET MY PITCHES =================
 
 const getMyPitches = async (req, res) => {
-
     try {
 
-        const pitches =
-            await Pitch
-                .find({
-                    founder: req.user.id
-                })
-                .sort({
-                    createdAt: -1
-                });
+        const pitches = await Pitch.find({
+            founder: req.user.id
+        }).sort({
+            createdAt: -1
+        });
 
-
-        res.json({
-
+        return res.json({
             success: true,
-
             pitches
-
         });
 
     } catch (error) {
 
-        res.status(500).json({
+        console.error(
+            "Get pitches error:",
+            error
+        );
+
+        return res.status(500).json({
             success: false,
-            message: "Unable to load your pitches"
+            message: "Unable to fetch pitches"
         });
     }
 };
 
 
-/* ================= PUBLISH PITCH ================= */
+// ================= GET PUBLISHED PITCHES =================
 
-const publishPitch = async (req, res) => {
-
+const getPublishedPitches = async (req, res) => {
     try {
 
-        const pitch =
-            await Pitch.findOne({
-                _id: req.params.id,
-                founder: req.user.id
-            });
+        const pitches = await Pitch.find({
+            status: "Published"
+        })
+        .populate(
+            "founder",
+            "name email role"
+        )
+        .sort({
+            createdAt: -1
+        });
 
+        return res.json({
+            success: true,
+            pitches
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Get published pitches error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to fetch pitches"
+        });
+    }
+};
+
+
+// ================= UPDATE PITCH =================
+
+const updatePitch = async (req, res) => {
+    try {
+
+        const pitch = await Pitch.findOne({
+            _id: req.params.id,
+            founder: req.user.id
+        });
 
         if (!pitch) {
-
             return res.status(404).json({
                 success: false,
                 message: "Pitch not found"
             });
         }
 
-
-        pitch.isPublished = true;
+        Object.assign(
+            pitch,
+            req.body
+        );
 
         await pitch.save();
 
-
-        res.json({
-
+        return res.json({
             success: true,
-
-            message:
-                "Pitch published successfully",
-
+            message: "Pitch updated successfully",
             pitch
-
         });
 
     } catch (error) {
 
-        res.status(500).json({
+        console.error(
+            "Update pitch error:",
+            error
+        );
+
+        return res.status(500).json({
             success: false,
-            message: "Unable to publish pitch"
+            message: "Unable to update pitch"
         });
     }
 };
 
 
-/* ================= ADD CONSULTANT FEEDBACK ================= */
+// ================= DELETE PITCH =================
 
-const addFeedback = async (req, res) => {
-
+const deletePitch = async (req, res) => {
     try {
 
-        if (req.user.role !== "consultant") {
-
-            return res.status(403).json({
-                success: false,
-                message:
-                    "Only consultants can provide feedback"
-            });
-        }
-
-
-        const pitch =
-            await Pitch.findById(
-                req.params.id
-            );
-
+        const pitch = await Pitch.findOneAndDelete({
+            _id: req.params.id,
+            founder: req.user.id
+        });
 
         if (!pitch) {
-
             return res.status(404).json({
                 success: false,
                 message: "Pitch not found"
             });
         }
 
-
-        pitch.comments.push({
-
-            consultant: req.user.id,
-
-            text: req.body.text
-
-        });
-
-
-        await pitch.save();
-
-
-        res.json({
-
+        return res.json({
             success: true,
-
-            message:
-                "Feedback added successfully",
-
-            pitch
-
+            message: "Pitch deleted successfully"
         });
 
     } catch (error) {
 
-        res.status(500).json({
+        console.error(
+            "Delete pitch error:",
+            error
+        );
+
+        return res.status(500).json({
             success: false,
-            message: "Unable to add feedback"
+            message: "Unable to delete pitch"
         });
     }
 };
@@ -238,8 +213,8 @@ const addFeedback = async (req, res) => {
 
 module.exports = {
     createPitch,
-    getPitches,
     getMyPitches,
-    publishPitch,
-    addFeedback
+    getPublishedPitches,
+    updatePitch,
+    deletePitch
 };
