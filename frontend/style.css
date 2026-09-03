@@ -674,7 +674,7 @@ select:focus {
     }
 
     .header-actions .button-outline {
-        display: none;
+        display: inline-flex;
     }
 
     .hero {
