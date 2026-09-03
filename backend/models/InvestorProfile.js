@@ -9,67 +9,48 @@ const investorProfileSchema = new mongoose.Schema(
             unique: true
         },
 
-        profilePhoto: {
+        firmName: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        headline: {
+        investmentFocus: {
             type: String,
-            maxlength: 120,
+            trim: true,
             default: ""
         },
 
-        bio: {
-            type: String,
-            maxlength: 1000,
-            default: ""
+        industries: {
+            type: [String],
+            default: []
         },
 
-        organization: {
+        ticketSize: {
             type: String,
+            trim: true,
             default: ""
         },
 
         location: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        investorType: {
+        bio: {
             type: String,
-            enum: [
-                "",
-                "angel",
-                "venture-capital",
-                "private-equity",
-                "family-office",
-                "corporate"
-            ],
-            default: ""
-        },
-
-        industries: [{
-            type: String
-        }],
-
-        preferredStages: [{
-            type: String
-        }],
-
-        website: {
-            type: String,
+            trim: true,
+            maxlength: 2000,
             default: ""
         }
     },
-
     {
         timestamps: true
     }
 );
 
-module.exports =
-    mongoose.model(
-        "InvestorProfile",
-        investorProfileSchema
-    );
+module.exports = mongoose.model(
+    "InvestorProfile",
+    investorProfileSchema
+);
