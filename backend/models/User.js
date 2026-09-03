@@ -5,7 +5,9 @@ const userSchema = new mongoose.Schema(
         name: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
+            minlength: 2,
+            maxlength: 100
         },
 
         email: {
@@ -24,20 +26,10 @@ const userSchema = new mongoose.Schema(
 
         role: {
             type: String,
-            enum: [
-                "founder",
-                "investor",
-                "consultant"
-            ],
-            required: true
-        },
-
-        profileCompleted: {
-            type: Boolean,
-            default: false
+            required: true,
+            enum: ["Founder", "Investor", "Consultant"]
         }
     },
-
     {
         timestamps: true
     }
