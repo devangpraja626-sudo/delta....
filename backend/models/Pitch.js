@@ -8,117 +8,60 @@ const pitchSchema = new mongoose.Schema(
             required: true
         },
 
-        startupName: {
+        title: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
+            maxlength: 150
         },
 
-        tagline: {
+        description: {
             type: String,
-            maxlength: 160,
-            default: ""
-        },
-
-        problem: {
-            type: String,
-            required: true
-        },
-
-        solution: {
-            type: String,
-            required: true
-        },
-
-        targetMarket: {
-            type: String,
-            default: ""
-        },
-
-        businessModel: {
-            type: String,
-            default: ""
-        },
-
-        traction: {
-            type: String,
-            default: ""
-        },
-
-        fundingStage: {
-            type: String,
-            enum: [
-                "idea",
-                "pre-seed",
-                "seed",
-                "early-stage",
-                "growth"
-            ],
-            default: "idea"
-        },
-
-        fundingRequired: {
-            type: Number,
-            default: 0
+            required: true,
+            trim: true,
+            maxlength: 5000
         },
 
         industry: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        pitchDeckUrl: {
+        stage: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        websiteUrl: {
+        fundingRequired: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        isPublished: {
-            type: Boolean,
-            default: false
+        website: {
+            type: String,
+            trim: true,
+            default: ""
         },
 
-        views: {
-            type: Number,
-            default: 0
-        },
-
-        interestedInvestors: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        }],
-
-        comments: [
-            {
-                consultant: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "User"
-                },
-
-                text: {
-                    type: String,
-                    required: true
-                },
-
-                createdAt: {
-                    type: Date,
-                    default: Date.now
-                }
-            }
-        ]
+        status: {
+            type: String,
+            enum: [
+                "Draft",
+                "Published",
+                "Closed"
+            ],
+            default: "Draft"
+        }
     },
-
     {
         timestamps: true
     }
 );
 
-module.exports =
-    mongoose.model(
-        "Pitch",
-        pitchSchema
-    );
+module.exports = mongoose.model(
+    "Pitch",
+    pitchSchema
+);
