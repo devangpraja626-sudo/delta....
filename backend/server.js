@@ -22,7 +22,19 @@ connectDB();
 
 app.use(
     cors({
-        origin: "*"
+        origin: "*",
+        methods: [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS"
+        ],
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization"
+        ]
     })
 );
 
@@ -34,21 +46,34 @@ app.use(
 
 app.use(
     express.urlencoded({
-        extended: true
+        extended: true,
+        limit: "10mb"
     })
 );
 
 app.use(morgan("dev"));
 
 
-// ================= HOME ROUTE =================
+// ================= HOME =================
 
 app.get("/", (req, res) => {
 
     res.json({
         success: true,
         message: "Delta API is running 🚀",
-        version: "1.0.0"
+        version: "2.0.0"
+    });
+
+});
+
+
+// ================= HEALTH =================
+
+app.get("/health", (req, res) => {
+
+    res.json({
+        success: true,
+        message: "Delta backend is healthy"
     });
 
 });
@@ -78,7 +103,9 @@ app.use((req, res) => {
 
     res.status(404).json({
         success: false,
-        message: "API route not found"
+        message: "API route not found",
+        path: req.originalUrl,
+        method: req.method
     });
 
 });
@@ -88,7 +115,10 @@ app.use((req, res) => {
 
 app.use((error, req, res, next) => {
 
-    console.error(error);
+    console.error(
+        "Server error:",
+        error
+    );
 
     res.status(500).json({
         success: false,
@@ -100,12 +130,16 @@ app.use((error, req, res, next) => {
 
 // ================= SERVER =================
 
-const PORT = process.env.PORT || 5000;
+const PORT =
+    process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(
+    PORT,
+    () => {
 
-    console.log(
-        `Delta server running on port ${PORT}`
-    );
+        console.log(
+            `Delta server running on port ${PORT}`
+        );
 
-});
+    }
+);
