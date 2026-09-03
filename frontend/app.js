@@ -1,6 +1,6 @@
 /* =========================================
    DELTA FRONTEND JAVASCRIPT
-   ========================================= */
+========================================= */
 
 /* ================= API ================= */
 
@@ -11,8 +11,10 @@ const API_URL = "https://delta-admin-qdbu.onrender.com";
 
 const authModal = document.getElementById("authModal");
 const authChoice = document.getElementById("authChoice");
+
 const registerForm = document.getElementById("registerForm");
 const loginFormWrap = document.getElementById("loginFormWrap");
+
 const continueButton = document.getElementById("continueButton");
 
 const selectedRole = document.getElementById("selectedRole");
@@ -29,7 +31,7 @@ let selectedUserRole = null;
 
 /* =========================================
    API HELPER
-   ========================================= */
+========================================= */
 
 async function apiRequest(endpoint, options = {}) {
 
@@ -53,15 +55,16 @@ async function apiRequest(endpoint, options = {}) {
 
     try {
         data = await response.json();
-    } catch {
-        data = {
-            success: false,
-            message: "Invalid server response"
-        };
+    } catch (error) {
+        throw new Error("Server returned an invalid response.");
     }
 
     if (!response.ok) {
-        throw new Error(data.message || "Something went wrong");
+        throw new Error(
+            data.message ||
+            data.error ||
+            `Request failed with status ${response.status}`
+        );
     }
 
     return data;
@@ -70,22 +73,27 @@ async function apiRequest(endpoint, options = {}) {
 
 /* =========================================
    AUTH MODAL
-   ========================================= */
+========================================= */
 
-function openJoin(role = null) {
+function openJoin() {
 
     if (!authModal) return;
 
-    authModal.classList.add("active");
-    authModal.setAttribute("aria-hidden", "false");
+    authModal.classList.remove("hidden");
+
+    if (authChoice) {
+        authChoice.classList.remove("hidden");
+    }
+
+    if (registerForm) {
+        registerForm.classList.add("hidden");
+    }
+
+    if (loginFormWrap) {
+        loginFormWrap.classList.add("hidden");
+    }
 
     document.body.style.overflow = "hidden";
-
-    showRoles();
-
-    if (role) {
-        chooseRole(role);
-    }
 }
 
 
@@ -93,8 +101,7 @@ function closeJoin() {
 
     if (!authModal) return;
 
-    authModal.classList.remove("active");
-    authModal.setAttribute("aria-hidden", "true");
+    authModal.classList.add("hidden");
 
     document.body.style.overflow = "";
 }
@@ -102,17 +109,33 @@ function closeJoin() {
 
 function showRoles() {
 
-    if (authChoice) authChoice.classList.remove("hidden");
-    if (registerForm) registerForm.classList.add("hidden");
-    if (loginFormWrap) loginFormWrap.classList.add("hidden");
+    if (authChoice) {
+        authChoice.classList.remove("hidden");
+    }
+
+    if (registerForm) {
+        registerForm.classList.add("hidden");
+    }
+
+    if (loginFormWrap) {
+        loginFormWrap.classList.add("hidden");
+    }
 }
 
 
 function showRegister() {
 
-    if (authChoice) authChoice.classList.add("hidden");
-    if (registerForm) registerForm.classList.remove("hidden");
-    if (loginFormWrap) loginFormWrap.classList.add("hidden");
+    if (authChoice) {
+        authChoice.classList.add("hidden");
+    }
+
+    if (registerForm) {
+        registerForm.classList.remove("hidden");
+    }
+
+    if (loginFormWrap) {
+        loginFormWrap.classList.add("hidden");
+    }
 
     if (registerMessage) {
         registerMessage.textContent = "";
@@ -122,9 +145,17 @@ function showRegister() {
 
 function showLogin() {
 
-    if (authChoice) authChoice.classList.add("hidden");
-    if (registerForm) registerForm.classList.add("hidden");
-    if (loginFormWrap) loginFormWrap.classList.remove("hidden");
+    if (authChoice) {
+        authChoice.classList.add("hidden");
+    }
+
+    if (registerForm) {
+        registerForm.classList.add("hidden");
+    }
+
+    if (loginFormWrap) {
+        loginFormWrap.classList.remove("hidden");
+    }
 
     if (loginMessage) {
         loginMessage.textContent = "";
@@ -132,74 +163,30 @@ function showLogin() {
 }
 
 
+/* =========================================
+   ROLE SELECTION
+========================================= */
+
 function chooseRole(role) {
 
     selectedUserRole = role;
 
     if (selectedRole) {
-        selectedRole.value = role;
+        selectedRole.dataset.role = role;
+        selectedRole.textContent = role;
     }
 
     if (roleText) {
         roleText.textContent = role;
     }
 
-    if (continueButton) {
-        continueButton.disabled = false;
-    }
-
-    document.querySelectorAll(".role-select button").forEach(button => {
-
-        button.classList.remove("selected");
-
-        const buttonRole =
-            button.dataset.role ||
-            button.getAttribute("data-role");
-
-        if (buttonRole === role) {
-            button.classList.add("selected");
-        }
-    });
-}
-
-
-/* =========================================
-   AUTH BUTTONS
-   ========================================= */
-
-document.querySelectorAll("[data-role]").forEach(button => {
-
-    button.addEventListener("click", function () {
-
-        const role = this.dataset.role;
-
-        if (role) {
-            chooseRole(role);
-        }
-
-    });
-
-});
-
-
-if (continueButton) {
-
-    continueButton.addEventListener("click", function () {
-
-        if (!selectedUserRole) {
-            return;
-        }
-
-        showRegister();
-
-    });
-
+    showRegister();
 }
 
 
 /* =========================================
    REGISTER
-   ========================================= */
+========================================= */
 
 if (registerForm) {
 
@@ -207,34 +194,41 @@ if (registerForm) {
 
         event.preventDefault();
 
-        const name =
-            document.getElementById("registerName")?.value.trim();
+        try {
 
-        const email =
-            document.getElementById("registerEmail")?.value.trim();
+            const name =
+                document.getElementById("name")?.value.trim();
 
-        const password =
-            document.getElementById("registerPassword")?.value;
+            const email =
+                document.getElementById("email")?.value.trim();
 
-        const role =
-            selectedUserRole ||
-            document.getElementById("selectedRole")?.value;
+            const password =
+                document.getElementById("password")?.value;
 
-        if (!name || !email || !password || !role) {
+            if (!name || !email || !password) {
+
+                if (registerMessage) {
+                    registerMessage.textContent =
+                        "Please fill all fields.";
+                }
+
+                return;
+            }
+
+            if (!selectedUserRole) {
+
+                if (registerMessage) {
+                    registerMessage.textContent =
+                        "Please select your role first.";
+                }
+
+                return;
+            }
 
             if (registerMessage) {
                 registerMessage.textContent =
-                    "Please fill all fields.";
+                    "Creating your account...";
             }
-
-            return;
-        }
-
-        if (registerMessage) {
-            registerMessage.textContent = "Creating your account...";
-        }
-
-        try {
 
             const data = await apiRequest("/api/auth/register", {
 
@@ -244,55 +238,36 @@ if (registerForm) {
                     name,
                     email,
                     password,
-                    role
+                    role: selectedUserRole
                 })
 
             });
 
-
             if (!data.success) {
                 throw new Error(
-                    data.message || "Registration failed"
+                    data.message || "Registration failed."
                 );
             }
 
-
-            localStorage.setItem(
-                "deltaToken",
-                data.token
-            );
-
-            localStorage.setItem(
-                "deltaUser",
-                JSON.stringify(data.user)
-            );
-
-
             if (registerMessage) {
-
                 registerMessage.textContent =
-                    "Account created successfully.";
-
+                    "Account created successfully. You can now login.";
             }
 
+            registerForm.reset();
 
             setTimeout(() => {
-
-                closeJoin();
-                openDashboard();
-
-            }, 500);
-
+                showLogin();
+            }, 800);
 
         } catch (error) {
 
+            console.error("REGISTER ERROR:", error);
+
             if (registerMessage) {
-
                 registerMessage.textContent =
-                    error.message;
-
+                    error.message || "Registration failed.";
             }
-
         }
 
     });
@@ -302,7 +277,7 @@ if (registerForm) {
 
 /* =========================================
    LOGIN
-   ========================================= */
+========================================= */
 
 if (loginFormWrap) {
 
@@ -310,32 +285,28 @@ if (loginFormWrap) {
 
         event.preventDefault();
 
+        try {
 
-        const email =
-            document.getElementById("loginEmail")?.value.trim();
+            const email =
+                document.getElementById("loginEmail")?.value.trim();
 
-        const password =
-            document.getElementById("loginPassword")?.value;
+            const password =
+                document.getElementById("loginPassword")?.value;
 
+            if (!email || !password) {
 
-        if (!email || !password) {
+                if (loginMessage) {
+                    loginMessage.textContent =
+                        "Please enter email and password.";
+                }
+
+                return;
+            }
 
             if (loginMessage) {
                 loginMessage.textContent =
-                    "Please enter email and password.";
+                    "Logging in...";
             }
-
-            return;
-        }
-
-
-        if (loginMessage) {
-            loginMessage.textContent =
-                "Logging in...";
-        }
-
-
-        try {
 
             const data = await apiRequest("/api/auth/login", {
 
@@ -348,13 +319,15 @@ if (loginFormWrap) {
 
             });
 
+            console.log("LOGIN RESPONSE:", data);
 
             if (!data.success) {
                 throw new Error(
-                    data.message || "Login failed"
+                    data.message || "Login failed."
                 );
             }
 
+            /* SAVE LOGIN */
 
             localStorage.setItem(
                 "deltaToken",
@@ -366,30 +339,34 @@ if (loginFormWrap) {
                 JSON.stringify(data.user)
             );
 
-
             if (loginMessage) {
-
                 loginMessage.textContent =
                     "Login successful.";
-
             }
 
+            console.log(
+                "TOKEN SAVED:",
+                !!localStorage.getItem("deltaToken")
+            );
 
-            setTimeout(() => {
+            console.log(
+                "USER SAVED:",
+                getCurrentUser()
+            );
 
-                closeJoin();
-                openDashboard();
+            /* OPEN DASHBOARD */
 
-            }, 400);
+            closeJoin();
 
+            openDashboard();
 
         } catch (error) {
 
+            console.error("LOGIN ERROR:", error);
+
             if (loginMessage) {
-
                 loginMessage.textContent =
-                    error.message;
-
+                    error.message || "Login failed.";
             }
 
         }
@@ -401,93 +378,148 @@ if (loginFormWrap) {
 
 /* =========================================
    CURRENT USER
-   ========================================= */
+========================================= */
 
 function getCurrentUser() {
 
-    const raw =
-        localStorage.getItem("deltaUser");
-
-    if (!raw) {
-        return null;
-    }
-
     try {
 
-        return JSON.parse(raw);
+        const user = localStorage.getItem("deltaUser");
 
-    } catch {
+        if (!user) {
+            return null;
+        }
+
+        return JSON.parse(user);
+
+    } catch (error) {
+
+        console.error(
+            "USER PARSE ERROR:",
+            error
+        );
 
         return null;
-
     }
-
 }
 
 
 /* =========================================
    OPEN DASHBOARD
-   ========================================= */
+========================================= */
 
 function openDashboard() {
 
+    console.log("=================================");
+    console.log("DELTA DASHBOARD OPEN");
+    console.log("=================================");
+
     const user = getCurrentUser();
 
+    console.log("CURRENT USER:", user);
+
     if (!user) {
+
+        console.error(
+            "No user found in localStorage."
+        );
+
+        return;
+    }
+
+    const landing =
+        document.getElementById("landingPage");
+
+    const dashboard =
+        document.getElementById("dashboardPage");
+
+    console.log("LANDING PAGE:", landing);
+    console.log("DASHBOARD PAGE:", dashboard);
+
+    if (!dashboard) {
+
+        console.error(
+            "dashboardPage element NOT FOUND."
+        );
+
         return;
     }
 
 
-    if (landingPage) {
-        landingPage.classList.add("hidden");
+    /* HIDE LANDING */
+
+    if (landing) {
+
+        landing.classList.add("hidden");
+
+        landing.style.display = "none";
     }
 
 
-    if (dashboardPage) {
-        dashboardPage.classList.remove("hidden");
-    }
+    /* SHOW DASHBOARD */
+
+    dashboard.classList.remove("hidden");
+
+    dashboard.style.display = "flex";
+
+    dashboard.style.visibility = "visible";
+
+    dashboard.style.opacity = "1";
 
 
     document.body.style.overflow = "";
 
 
+    /* GREETING */
+
     const greeting =
         document.getElementById("dashboardGreeting");
-
-    const badge =
-        document.getElementById("userBadge");
-
 
     if (greeting) {
 
         greeting.textContent =
-            `Welcome, ${user.name}.`;
-
+            `Welcome, ${user.name || "Founder"}.`;
     }
 
+
+    /* USER BADGE */
+
+    const badge =
+        document.getElementById("userBadge");
 
     if (badge) {
 
         badge.textContent =
-            user.role;
-
+            user.role || "Member";
     }
 
 
+    /* DEFAULT SECTION */
+
     showDashboardSection("dashboard");
 
-    loadDashboard();
 
+    console.log(
+        "DASHBOARD OPENED SUCCESSFULLY"
+    );
+
+
+    /* LOAD DATA */
+
+    loadDashboard();
 }
 
 
 /* =========================================
-   DASHBOARD SECTIONS
-   ========================================= */
+   DASHBOARD NAVIGATION
+========================================= */
 
 function showDashboardSection(section) {
 
-    document.querySelectorAll(".dash-section").forEach(item => {
+    const sections =
+        document.querySelectorAll(".dash-section");
+
+    sections.forEach(function (item) {
 
         item.classList.add("hidden");
 
@@ -499,7 +531,6 @@ function showDashboardSection(section) {
             `section-${section}`
         );
 
-
     if (target) {
 
         target.classList.remove("hidden");
@@ -507,77 +538,79 @@ function showDashboardSection(section) {
     }
 
 
-    document.querySelectorAll(".side-link").forEach(link => {
+    /* SIDE LINKS */
+
+    const links =
+        document.querySelectorAll(".side-link");
+
+    links.forEach(function (link) {
 
         link.classList.remove("active");
 
-        if (
-            link.dataset.section === section
-        ) {
+        const targetSection =
+            link.dataset.section;
 
+        if (targetSection === section) {
             link.classList.add("active");
-
         }
 
     });
 
 
+    /* LOAD SECTION DATA */
+
     if (section === "profile") {
-
         loadProfile();
-
     }
 
     if (section === "pitches") {
-
         loadMyPitches();
-
     }
 
     if (section === "discover") {
-
         loadDiscover();
-
     }
 
     if (section === "connections") {
-
         loadConnections();
-
     }
 
 }
 
 
 /* =========================================
-   SIDEBAR NAVIGATION
-   ========================================= */
+   SIDEBAR LINKS
+========================================= */
 
-document.querySelectorAll(".side-link").forEach(link => {
+document
+    .querySelectorAll(".side-link")
+    .forEach(function (link) {
 
-    link.addEventListener("click", function (event) {
+        link.addEventListener("click", function (event) {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const section =
-            this.dataset.section;
+            const section =
+                link.dataset.section;
 
-        if (section) {
+            if (section) {
+                showDashboardSection(section);
+            }
 
-            showDashboardSection(section);
-
-        }
+        });
 
     });
 
-});
-
 
 /* =========================================
-   DASHBOARD OVERVIEW
-   ========================================= */
+   DASHBOARD LOAD
+========================================= */
 
 async function loadDashboard() {
+
+    console.log(
+        "Loading dashboard data..."
+    );
 
     try {
 
@@ -587,10 +620,14 @@ async function loadDashboard() {
             loadConnections()
         ]);
 
+        console.log(
+            "Dashboard data loaded."
+        );
+
     } catch (error) {
 
         console.error(
-            "Dashboard loading error:",
+            "DASHBOARD LOAD ERROR:",
             error
         );
 
@@ -601,128 +638,103 @@ async function loadDashboard() {
 
 /* =========================================
    PROFILE
-   ========================================= */
+========================================= */
 
 async function loadProfile() {
 
     try {
 
         const data =
-            await apiRequest("/api/profiles/me");
+            await apiRequest(
+                "/api/profiles/me"
+            );
 
-
-        const user =
-            data.user || getCurrentUser();
+        console.log(
+            "PROFILE:",
+            data
+        );
 
         const profile =
-            data.profile || {};
+            data.profile || data.user || data;
+
+        if (!profile) return;
 
 
         const profileName =
-            document.getElementById("profileName");
+            document.getElementById(
+                "profileName"
+            );
 
         const startupName =
-            document.getElementById("startupName");
+            document.getElementById(
+                "startupName"
+            );
 
         const industry =
-            document.getElementById("industry");
+            document.getElementById(
+                "industry"
+            );
 
         const location =
-            document.getElementById("location");
+            document.getElementById(
+                "location"
+            );
 
         const stage =
-            document.getElementById("stage");
+            document.getElementById(
+                "stage"
+            );
 
         const website =
-            document.getElementById("website");
+            document.getElementById(
+                "website"
+            );
 
         const bio =
-            document.getElementById("bio");
-
-
-        if (profileName) {
-            profileName.value =
-                user?.name || "";
-        }
-
-        if (startupName) {
-            startupName.value =
-                profile.startupName || "";
-        }
-
-        if (industry) {
-            industry.value =
-                profile.industry || "";
-        }
-
-        if (location) {
-            location.value =
-                profile.location || "";
-        }
-
-        if (stage) {
-            stage.value =
-                profile.stage || "";
-        }
-
-        if (website) {
-            website.value =
-                profile.website || "";
-        }
-
-        if (bio) {
-            bio.value =
-                profile.bio || "";
-        }
-
-
-        let completed = 0;
-
-        const requiredFields = [
-            profile.startupName,
-            profile.industry,
-            profile.location,
-            profile.stage,
-            profile.bio
-        ];
-
-
-        requiredFields.forEach(field => {
-
-            if (
-                field &&
-                String(field).trim() !== ""
-            ) {
-
-                completed++;
-
-            }
-
-        });
-
-
-        const percentage =
-            Math.round(
-                (completed / requiredFields.length) * 100
+            document.getElementById(
+                "bio"
             );
 
 
-        const profileStatus =
-            document.getElementById("profileStatus");
+        if (profileName)
+            profileName.value =
+                profile.name || "";
 
 
-        if (profileStatus) {
+        if (startupName)
+            startupName.value =
+                profile.startupName || "";
 
-            profileStatus.textContent =
-                `${percentage}%`;
 
-        }
+        if (industry)
+            industry.value =
+                profile.industry || "";
+
+
+        if (location)
+            location.value =
+                profile.location || "";
+
+
+        if (stage)
+            stage.value =
+                profile.stage || "";
+
+
+        if (website)
+            website.value =
+                profile.website || "";
+
+
+        if (bio)
+            bio.value =
+                profile.bio || "";
 
 
     } catch (error) {
 
         console.error(
-            "Profile error:",
+            "PROFILE LOAD ERROR:",
             error
         );
 
@@ -732,315 +744,328 @@ async function loadProfile() {
 
 
 /* =========================================
-   UPDATE PROFILE
-   ========================================= */
+   SAVE PROFILE
+========================================= */
 
 const profileForm =
     document.getElementById("profileForm");
 
-
 if (profileForm) {
 
-    profileForm.addEventListener("submit", async function (event) {
+    profileForm.addEventListener(
+        "submit",
+        async function (event) {
 
-        event.preventDefault();
+            event.preventDefault();
+
+            const profileMessage =
+                document.getElementById(
+                    "profileMessage"
+                );
+
+            try {
+
+                const payload = {
+
+                    name:
+                        document.getElementById(
+                            "profileName"
+                        )?.value.trim(),
+
+                    startupName:
+                        document.getElementById(
+                            "startupName"
+                        )?.value.trim(),
+
+                    industry:
+                        document.getElementById(
+                            "industry"
+                        )?.value.trim(),
+
+                    location:
+                        document.getElementById(
+                            "location"
+                        )?.value.trim(),
+
+                    stage:
+                        document.getElementById(
+                            "stage"
+                        )?.value,
+
+                    website:
+                        document.getElementById(
+                            "website"
+                        )?.value.trim(),
+
+                    bio:
+                        document.getElementById(
+                            "bio"
+                        )?.value.trim()
+
+                };
 
 
-        const profileMessage =
-            document.getElementById("profileMessage");
+                if (profileMessage) {
+
+                    profileMessage.textContent =
+                        "Saving profile...";
+                }
 
 
-        const body = {
-
-            startupName:
-                document.getElementById("startupName")?.value.trim() || "",
-
-            industry:
-                document.getElementById("industry")?.value.trim() || "",
-
-            location:
-                document.getElementById("location")?.value.trim() || "",
-
-            stage:
-                document.getElementById("stage")?.value.trim() || "",
-
-            website:
-                document.getElementById("website")?.value.trim() || "",
-
-            bio:
-                document.getElementById("bio")?.value.trim() || ""
-
-        };
+                const data =
+                    await apiRequest(
+                        "/api/profiles/me",
+                        {
+                            method: "PUT",
+                            body: JSON.stringify(payload)
+                        }
+                    );
 
 
-        if (profileMessage) {
+                if (profileMessage) {
 
-            profileMessage.textContent =
-                "Saving profile...";
-
-        }
-
-
-        try {
-
-            await apiRequest("/api/profiles/me", {
-
-                method: "PUT",
-
-                body: JSON.stringify(body)
-
-            });
+                    profileMessage.textContent =
+                        data.message ||
+                        "Profile saved successfully.";
+                }
 
 
-            if (profileMessage) {
+            } catch (error) {
 
-                profileMessage.textContent =
-                    "Profile updated successfully.";
+                console.error(
+                    "PROFILE SAVE ERROR:",
+                    error
+                );
+
+                if (profileMessage) {
+
+                    profileMessage.textContent =
+                        error.message ||
+                        "Could not save profile.";
+                }
 
             }
 
-
-            await loadProfile();
-
-
-        } catch (error) {
-
-            if (profileMessage) {
-
-                profileMessage.textContent =
-                    error.message;
-
-            }
-
         }
-
-    });
+    );
 
 }
 
 
 /* =========================================
    CREATE PITCH
-   ========================================= */
+========================================= */
 
 const pitchForm =
     document.getElementById("pitchForm");
 
-
 if (pitchForm) {
 
-    pitchForm.addEventListener("submit", async function (event) {
+    pitchForm.addEventListener(
+        "submit",
+        async function (event) {
 
-        event.preventDefault();
+            event.preventDefault();
 
-
-        const pitchMessage =
-            document.getElementById("pitchMessage");
-
-
-        const body = {
-
-            title:
-                document.getElementById("pitchTitle")?.value.trim() || "",
-
-            description:
-                document.getElementById("pitchDescription")?.value.trim() || "",
-
-            industry:
-                document.getElementById("pitchIndustry")?.value.trim() || "",
-
-            stage:
-                document.getElementById("pitchStage")?.value.trim() || "",
-
-            fundingRequired:
-                document.getElementById("fundingRequired")?.value || 0,
-
-            website:
-                document.getElementById("pitchWebsite")?.value.trim() || "",
-
-            status:
-                document.getElementById("pitchStatus")?.value || "Draft"
-
-        };
-
-
-        if (!body.title || !body.description) {
-
-            if (pitchMessage) {
-
-                pitchMessage.textContent =
-                    "Title and description are required.";
-
-            }
-
-            return;
-
-        }
-
-
-        if (pitchMessage) {
-
-            pitchMessage.textContent =
-                "Creating pitch...";
-
-        }
-
-
-        try {
-
-            const data =
-                await apiRequest("/api/pitches", {
-
-                    method: "POST",
-
-                    body: JSON.stringify(body)
-
-                });
-
-
-            if (!data.success) {
-
-                throw new Error(
-                    data.message || "Pitch creation failed"
+            const pitchMessage =
+                document.getElementById(
+                    "pitchMessage"
                 );
 
-            }
+            try {
+
+                const payload = {
+
+                    title:
+                        document.getElementById(
+                            "pitchTitle"
+                        )?.value.trim(),
+
+                    industry:
+                        document.getElementById(
+                            "pitchIndustry"
+                        )?.value.trim(),
+
+                    stage:
+                        document.getElementById(
+                            "pitchStage"
+                        )?.value,
+
+                    fundingRequired:
+                        document.getElementById(
+                            "fundingRequired"
+                        )?.value,
+
+                    website:
+                        document.getElementById(
+                            "pitchWebsite"
+                        )?.value.trim(),
+
+                    status:
+                        document.getElementById(
+                            "pitchStatus"
+                        )?.value,
+
+                    description:
+                        document.getElementById(
+                            "pitchDescription"
+                        )?.value.trim()
+
+                };
 
 
-            if (pitchMessage) {
+                if (pitchMessage) {
 
-                pitchMessage.textContent =
-                    "Pitch created successfully.";
-
-            }
-
-
-            pitchForm.reset();
-
-            await loadMyPitches();
+                    pitchMessage.textContent =
+                        "Publishing pitch...";
+                }
 
 
-        } catch (error) {
+                const data =
+                    await apiRequest(
+                        "/api/pitches",
+                        {
+                            method: "POST",
+                            body: JSON.stringify(payload)
+                        }
+                    );
 
-            if (pitchMessage) {
 
-                pitchMessage.textContent =
-                    error.message;
+                if (pitchMessage) {
+
+                    pitchMessage.textContent =
+                        data.message ||
+                        "Pitch published successfully.";
+                }
+
+
+                pitchForm.reset();
+
+                loadMyPitches();
+
+
+            } catch (error) {
+
+                console.error(
+                    "PITCH CREATE ERROR:",
+                    error
+                );
+
+                if (pitchMessage) {
+
+                    pitchMessage.textContent =
+                        error.message ||
+                        "Could not publish pitch.";
+                }
 
             }
 
         }
-
-    });
+    );
 
 }
 
 
 /* =========================================
    MY PITCHES
-   ========================================= */
+========================================= */
 
 async function loadMyPitches() {
 
     const container =
-        document.getElementById("myPitches");
+        document.getElementById(
+            "myPitches"
+        );
 
-
-    if (!container) {
-        return;
-    }
-
-
-    container.innerHTML =
-        "<p>Loading pitches...</p>";
+    if (!container) return;
 
 
     try {
 
         const data =
-            await apiRequest("/api/pitches/my");
+            await apiRequest(
+                "/api/pitches/my"
+            );
 
+        console.log(
+            "MY PITCHES:",
+            data
+        );
 
         const pitches =
             data.pitches || [];
 
 
-        const pitchCount =
-            document.getElementById("pitchCount");
-
-
-        if (pitchCount) {
-
-            pitchCount.textContent =
-                pitches.length;
-
-        }
-
-
-        if (pitches.length === 0) {
+        if (!pitches.length) {
 
             container.innerHTML = `
                 <div class="empty-state">
                     <h3>No pitches yet</h3>
-                    <p>Create your first startup pitch.</p>
+                    <p>Create your first pitch and put your startup in front of the ecosystem.</p>
                 </div>
             `;
 
             return;
-
         }
 
 
         container.innerHTML =
-            pitches.map(pitch => `
+            pitches.map(function (pitch) {
 
-                <div class="pitch-card">
+                return `
+                    <div class="pitch-card">
 
-                    <div class="pitch-card-top">
+                        <h3>
+                            ${escapeHTML(
+                                pitch.title || "Untitled Pitch"
+                            )}
+                        </h3>
 
-                        <span class="status-badge">
-                            ${escapeHTML(pitch.status || "Draft")}
-                        </span>
+                        <p>
+                            ${escapeHTML(
+                                pitch.description || ""
+                            )}
+                        </p>
+
+                        <div class="pitch-meta">
+
+                            <span>
+                                ${escapeHTML(
+                                    pitch.industry || ""
+                                )}
+                            </span>
+
+                            <span>
+                                ${escapeHTML(
+                                    pitch.stage || ""
+                                )}
+                            </span>
+
+                            <span>
+                                ${escapeHTML(
+                                    pitch.status || ""
+                                )}
+                            </span>
+
+                        </div>
 
                     </div>
+                `;
 
-                    <h3>
-                        ${escapeHTML(pitch.title || "Untitled Pitch")}
-                    </h3>
-
-                    <p>
-                        ${escapeHTML(
-                            pitch.description || ""
-                        )}
-                    </p>
-
-                    <div class="pitch-meta">
-
-                        <span>
-                            ${escapeHTML(
-                                pitch.industry || "—"
-                            )}
-                        </span>
-
-                        <span>
-                            ${escapeHTML(
-                                pitch.stage || "—"
-                            )}
-                        </span>
-
-                    </div>
-
-                </div>
-
-            `).join("");
+            }).join("");
 
 
     } catch (error) {
 
+        console.error(
+            "PITCH LOAD ERROR:",
+            error
+        );
+
         container.innerHTML = `
-            <p class="error-message">
-                ${escapeHTML(error.message)}
-            </p>
+            <div class="empty-state">
+                Unable to load pitches.
+            </div>
         `;
 
     }
@@ -1050,42 +1075,47 @@ async function loadMyPitches() {
 
 /* =========================================
    DISCOVER
-   ========================================= */
+========================================= */
+
+const discoverRole =
+    document.getElementById(
+        "discoverRole"
+    );
+
+if (discoverRole) {
+
+    discoverRole.addEventListener(
+        "change",
+        loadDiscover
+    );
+
+}
+
 
 async function loadDiscover() {
 
     const container =
-        document.getElementById("discoverUsers");
+        document.getElementById(
+            "discoverUsers"
+        );
 
-
-    if (!container) {
-        return;
-    }
-
-
-    const roleSelect =
-        document.getElementById("discoverRole");
-
-
-    const role =
-        roleSelect?.value || "";
-
-
-    container.innerHTML =
-        "<p>Loading people...</p>";
+    if (!container) return;
 
 
     try {
 
+        const role =
+            discoverRole?.value || "";
+
+
         let endpoint =
-            "/api/connections/discover";
+            "/api/profiles";
 
 
         if (role) {
 
             endpoint +=
                 `?role=${encodeURIComponent(role)}`;
-
         }
 
 
@@ -1093,30 +1123,36 @@ async function loadDiscover() {
             await apiRequest(endpoint);
 
 
+        console.log(
+            "DISCOVER:",
+            data
+        );
+
+
         const users =
-            data.users || [];
+            data.profiles ||
+            data.users ||
+            [];
 
 
-        if (users.length === 0) {
+        if (!users.length) {
 
             container.innerHTML = `
                 <div class="empty-state">
-                    <h3>No people found</h3>
-                    <p>Try another role.</p>
+                    <h3>No members found</h3>
+                    <p>Try another role or check back later.</p>
                 </div>
             `;
 
             return;
-
         }
 
 
         container.innerHTML =
-            users.map(user => `
+            users.map(function (user) {
 
-                <div class="discover-card">
-
-                    <div>
+                return `
+                    <div class="member-card">
 
                         <h3>
                             ${escapeHTML(
@@ -1130,32 +1166,36 @@ async function loadDiscover() {
                             )}
                         </p>
 
-                        ${
-                            user.email
-                                ? `<small>${escapeHTML(user.email)}</small>`
-                                : ""
-                        }
+                        <p>
+                            ${escapeHTML(
+                                user.startupName || ""
+                            )}
+                        </p>
+
+                        <button
+                            class="primary-btn"
+                            onclick="sendConnection('${user._id || user.id}')"
+                        >
+                            Connect
+                        </button>
 
                     </div>
+                `;
 
-                    <button
-                        class="btn btn-primary"
-                        onclick="connectUser('${user._id}')"
-                    >
-                        Connect
-                    </button>
-
-                </div>
-
-            `).join("");
+            }).join("");
 
 
     } catch (error) {
 
+        console.error(
+            "DISCOVER ERROR:",
+            error
+        );
+
         container.innerHTML = `
-            <p class="error-message">
-                ${escapeHTML(error.message)}
-            </p>
+            <div class="empty-state">
+                Unable to load members.
+            </div>
         `;
 
     }
@@ -1164,42 +1204,126 @@ async function loadDiscover() {
 
 
 /* =========================================
-   DISCOVER FILTER
-   ========================================= */
+   CONNECTIONS
+========================================= */
 
-const discoverRole =
-    document.getElementById("discoverRole");
+async function loadConnections() {
 
+    const container =
+        document.getElementById(
+            "connectionsList"
+        );
 
-if (discoverRole) {
-
-    discoverRole.addEventListener("change", function () {
-
-        loadDiscover();
-
-    });
-
-}
-
-
-/* =========================================
-   SEND CONNECTION
-   ========================================= */
-
-async function connectUser(userId) {
-
-    if (!userId) {
-        return;
-    }
+    if (!container) return;
 
 
     try {
 
         const data =
             await apiRequest(
-                `/api/connections/request/${userId}`,
+                "/api/connections"
+            );
+
+
+        console.log(
+            "CONNECTIONS:",
+            data
+        );
+
+
+        const connections =
+            data.connections || [];
+
+
+        if (!connections.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>No connections yet</h3>
+                    <p>Start discovering founders, investors and consultants.</p>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            connections.map(function (connection) {
+
+                const person =
+                    connection.user ||
+                    connection.sender ||
+                    connection.receiver ||
+                    {};
+
+
+                return `
+                    <div class="connection-card">
+
+                        <h3>
+                            ${escapeHTML(
+                                person.name ||
+                                "Delta Member"
+                            )}
+                        </h3>
+
+                        <p>
+                            ${escapeHTML(
+                                person.role || ""
+                            )}
+                        </p>
+
+                        <span>
+                            ${escapeHTML(
+                                connection.status ||
+                                "connected"
+                            )}
+                        </span>
+
+                    </div>
+                `;
+
+            }).join("");
+
+
+    } catch (error) {
+
+        console.error(
+            "CONNECTIONS ERROR:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="empty-state">
+                Unable to load connections.
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================
+   SEND CONNECTION
+========================================= */
+
+async function sendConnection(userId) {
+
+    if (!userId) return;
+
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/connections",
                 {
-                    method: "POST"
+                    method: "POST",
+                    body: JSON.stringify({
+                        userId
+                    })
                 }
             );
 
@@ -1210,262 +1334,20 @@ async function connectUser(userId) {
         );
 
 
-        await loadDiscover();
-
-        await loadConnections();
+        loadConnections();
 
 
     } catch (error) {
 
-        alert(error.message);
-
-    }
-
-}
-
-
-/* =========================================
-   CONNECTIONS
-   ========================================= */
-
-async function loadConnections() {
-
-    const container =
-        document.getElementById("connectionsList");
-
-
-    if (!container) {
-        return;
-    }
-
-
-    container.innerHTML =
-        "<p>Loading connections...</p>";
-
-
-    try {
-
-        const data =
-            await apiRequest("/api/connections");
-
-
-        const connections =
-            data.connections || [];
-
-
-        const connectionCount =
-            document.getElementById("connectionCount");
-
-
-        const currentUser =
-            getCurrentUser();
-
-
-        const acceptedConnections =
-            connections.filter(
-                connection =>
-                    connection.status === "accepted"
-            );
-
-
-        if (connectionCount) {
-
-            connectionCount.textContent =
-                acceptedConnections.length;
-
-        }
-
-
-        if (connections.length === 0) {
-
-            container.innerHTML = `
-                <div class="empty-state">
-                    <h3>No connections yet</h3>
-                    <p>Discover founders, investors and consultants.</p>
-                </div>
-            `;
-
-            return;
-
-        }
-
-
-        container.innerHTML =
-            connections.map(connection => {
-
-                const sender =
-                    connection.sender || {};
-
-                const receiver =
-                    connection.receiver || {};
-
-
-                const currentId =
-                    String(currentUser?.id || "");
-
-
-                const senderId =
-                    String(sender._id || "");
-
-
-                const receiverId =
-                    String(receiver._id || "");
-
-
-                const otherUser =
-                    senderId === currentId
-                        ? receiver
-                        : sender;
-
-
-                let actions = "";
-
-
-                if (
-                    connection.status === "pending" &&
-                    receiverId === currentId
-                ) {
-
-                    actions = `
-
-                        <button
-                            class="btn btn-primary"
-                            onclick="acceptConnection('${connection._id}')"
-                        >
-                            Accept
-                        </button>
-
-                        <button
-                            class="btn btn-secondary"
-                            onclick="rejectConnection('${connection._id}')"
-                        >
-                            Reject
-                        </button>
-
-                    `;
-
-                }
-
-
-                return `
-
-                    <div class="connection-card">
-
-                        <div>
-
-                            <h3>
-                                ${escapeHTML(
-                                    otherUser.name ||
-                                    "Delta Member"
-                                )}
-                            </h3>
-
-                            <p>
-                                ${escapeHTML(
-                                    otherUser.role ||
-                                    ""
-                                )}
-                            </p>
-
-                            <span class="status-badge">
-                                ${escapeHTML(
-                                    connection.status ||
-                                    "pending"
-                                )}
-                            </span>
-
-                        </div>
-
-                        <div class="connection-actions">
-
-                            ${actions}
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }).join("");
-
-
-    } catch (error) {
-
-        container.innerHTML = `
-            <p class="error-message">
-                ${escapeHTML(error.message)}
-            </p>
-        `;
-
-    }
-
-}
-
-
-/* =========================================
-   ACCEPT CONNECTION
-   ========================================= */
-
-async function acceptConnection(connectionId) {
-
-    try {
-
-        const data =
-            await apiRequest(
-                `/api/connections/${connectionId}/accept`,
-                {
-                    method: "PUT"
-                }
-            );
-
-
-        alert(
-            data.message ||
-            "Connection accepted."
+        console.error(
+            "CONNECTION ERROR:",
+            error
         );
 
-
-        await loadConnections();
-
-
-    } catch (error) {
-
-        alert(error.message);
-
-    }
-
-}
-
-
-/* =========================================
-   REJECT CONNECTION
-   ========================================= */
-
-async function rejectConnection(connectionId) {
-
-    try {
-
-        const data =
-            await apiRequest(
-                `/api/connections/${connectionId}/reject`,
-                {
-                    method: "PUT"
-                }
-            );
-
-
         alert(
-            data.message ||
-            "Connection rejected."
+            error.message ||
+            "Could not send connection request."
         );
-
-
-        await loadConnections();
-
-
-    } catch (error) {
-
-        alert(error.message);
 
     }
 
@@ -1474,62 +1356,115 @@ async function rejectConnection(connectionId) {
 
 /* =========================================
    LOGOUT
-   ========================================= */
+========================================= */
 
-function logout() {
+const logoutButton =
+    document.getElementById(
+        "logoutButton"
+    );
 
-    localStorage.removeItem("deltaToken");
-    localStorage.removeItem("deltaUser");
+if (logoutButton) {
 
-    if (dashboardPage) {
-        dashboardPage.classList.add("hidden");
-    }
+    logoutButton.addEventListener(
+        "click",
+        function () {
 
-    if (landingPage) {
-        landingPage.classList.remove("hidden");
-    }
+            localStorage.removeItem(
+                "deltaToken"
+            );
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+            localStorage.removeItem(
+                "deltaUser"
+            );
+
+
+            if (dashboardPage) {
+
+                dashboardPage.classList.add(
+                    "hidden"
+                );
+
+                dashboardPage.style.display =
+                    "none";
+            }
+
+
+            if (landingPage) {
+
+                landingPage.classList.remove(
+                    "hidden"
+                );
+
+                landingPage.style.display =
+                    "";
+            }
+
+
+            window.scrollTo(0, 0);
+
+        }
+    );
 
 }
 
 
 /* =========================================
-   ESCAPE HTML
-   ========================================= */
+   HTML ESCAPE
+========================================= */
 
 function escapeHTML(value) {
 
-    return String(value ?? "")
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
 
 
 /* =========================================
-   AUTO LOGIN
-   ========================================= */
+   AUTO LOGIN / SESSION RESTORE
+========================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    const user =
-        getCurrentUser();
-
-    const token =
-        localStorage.getItem("deltaToken");
+        console.log(
+            "DELTA APP INITIALIZED"
+        );
 
 
-    if (user && token) {
+        const user =
+            getCurrentUser();
 
-        openDashboard();
+        const token =
+            localStorage.getItem(
+                "deltaToken"
+            );
+
+
+        console.log(
+            "TOKEN EXISTS:",
+            !!token
+        );
+
+        console.log(
+            "USER EXISTS:",
+            !!user
+        );
+
+
+        if (user && token) {
+
+            openDashboard();
+
+        }
 
     }
-
-});
+);
