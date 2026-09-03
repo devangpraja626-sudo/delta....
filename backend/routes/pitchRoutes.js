@@ -1,51 +1,56 @@
 const express = require("express");
 
-const protect =
-    require("../middleware/authMiddleware");
-
 const {
     createPitch,
-    getPitches,
     getMyPitches,
-    publishPitch,
-    addFeedback
+    getPublishedPitches,
+    updatePitch,
+    deletePitch
 } = require("../controllers/pitchController");
+
+const authMiddleware = require(
+    "../middleware/authMiddleware"
+);
 
 const router = express.Router();
 
 
+// Published pitches
+router.get(
+    "/published",
+    getPublishedPitches
+);
+
+
+// Create pitch
 router.post(
     "/",
-    protect,
+    authMiddleware,
     createPitch
 );
 
 
-router.get(
-    "/",
-    protect,
-    getPitches
-);
-
-
+// My pitches
 router.get(
     "/my",
-    protect,
+    authMiddleware,
     getMyPitches
 );
 
 
-router.patch(
-    "/:id/publish",
-    protect,
-    publishPitch
+// Update pitch
+router.put(
+    "/:id",
+    authMiddleware,
+    updatePitch
 );
 
 
-router.post(
-    "/:id/feedback",
-    protect,
-    addFeedback
+// Delete pitch
+router.delete(
+    "/:id",
+    authMiddleware,
+    deletePitch
 );
 
 
