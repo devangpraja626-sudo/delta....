@@ -9,88 +9,48 @@ const consultantProfileSchema = new mongoose.Schema(
             unique: true
         },
 
-        profilePhoto: {
+        expertise: {
+            type: [String],
+            default: []
+        },
+
+        experience: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        headline: {
+        hourlyRate: {
             type: String,
-            maxlength: 120,
-            default: ""
-        },
-
-        bio: {
-            type: String,
-            maxlength: 1000,
-            default: ""
-        },
-
-        professionalTitle: {
-            type: String,
-            default: ""
-        },
-
-        company: {
-            type: String,
+            trim: true,
             default: ""
         },
 
         location: {
             type: String,
+            trim: true,
             default: ""
         },
 
-        expertise: [{
-            type: String
-        }],
-
-        industries: [{
-            type: String
-        }],
-
-        experienceYears: {
-            type: Number,
-            min: 0,
-            default: 0
+        bio: {
+            type: String,
+            trim: true,
+            maxlength: 2000,
+            default: ""
         },
 
         website: {
             type: String,
+            trim: true,
             default: ""
-        },
-
-        linkedin: {
-            type: String,
-            default: ""
-        },
-
-        services: [{
-            type: String
-        }],
-
-        availableFor: [{
-            type: String,
-            enum: [
-                "feedback",
-                "mentoring",
-                "strategy",
-                "business-consulting",
-                "fundraising",
-                "marketing",
-                "product",
-                "technology"
-            ]
-        }]
+        }
     },
-
     {
         timestamps: true
     }
 );
 
-module.exports =
-    mongoose.model(
-        "ConsultantProfile",
-        consultantProfileSchema
-    );
+module.exports = mongoose.model(
+    "ConsultantProfile",
+    consultantProfileSchema
+);
