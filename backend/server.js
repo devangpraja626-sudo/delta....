@@ -9,6 +9,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const pitchRoutes = require("./routes/pitchRoutes");
+const connectionRoutes = require("./routes/connectionRoutes");
 
 const app = express();
 
@@ -61,7 +62,7 @@ app.get("/", (req, res) => {
     res.json({
         success: true,
         message: "Delta API is running 🚀",
-        version: "2.0.0"
+        version: "3.0.0"
     });
 
 });
@@ -79,7 +80,7 @@ app.get("/health", (req, res) => {
 });
 
 
-// ================= API ROUTES =================
+// ================= API =================
 
 app.use(
     "/api/auth",
@@ -94,6 +95,11 @@ app.use(
 app.use(
     "/api/pitches",
     pitchRoutes
+);
+
+app.use(
+    "/api/connections",
+    connectionRoutes
 );
 
 
@@ -111,7 +117,7 @@ app.use((req, res) => {
 });
 
 
-// ================= ERROR HANDLER =================
+// ================= ERROR =================
 
 app.use((error, req, res, next) => {
 
@@ -136,10 +142,8 @@ const PORT =
 app.listen(
     PORT,
     () => {
-
         console.log(
             `Delta server running on port ${PORT}`
         );
-
     }
 );
