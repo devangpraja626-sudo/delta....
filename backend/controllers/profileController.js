@@ -1,242 +1,139 @@
 const User = require("../models/User");
 
-const FounderProfile =
-    require("../models/FounderProfile");
+const FounderProfile = require(
+    "../models/FounderProfile"
+);
 
-const InvestorProfile =
-    require("../models/InvestorProfile");
+const InvestorProfile = require(
+    "../models/InvestorProfile"
+);
 
-const ConsultantProfile =
-    require("../models/ConsultantProfile");
+const ConsultantProfile = require(
+    "../models/ConsultantProfile"
+);
 
 
-/* ================= CREATE / UPDATE PROFILE ================= */
+// ================= GET PROFILE =================
 
-const saveProfile = async (req, res) => {
-
+const getProfile = async (req, res) => {
     try {
 
-        const userId = req.user.id;
-
-        const user =
-            await User.findById(userId);
-
+        const user = await User.findById(req.user.id)
+            .select("-password");
 
         if (!user) {
-
             return res.status(404).json({
                 success: false,
                 message: "User not found"
             });
         }
 
+        let profile = null;
 
-        let ProfileModel;
-
-
-        if (user.role === "founder") {
-
-            ProfileModel =
-                FounderProfile;
-
-        } else if (user.role === "investor") {
-
-            ProfileModel =
-                InvestorProfile;
-
-        } else if (user.role === "consultant") {
-
-            ProfileModel =
-                ConsultantProfile;
-
-        } else {
-
-            return res.status(400).json({
-                success: false,
-                message: "Invalid user role"
+        if (user.role === "Founder") {
+            profile = await FounderProfile.findOne({
+                user: user._id
             });
         }
 
+        if (user.role === "Investor") {
+            profile = await InvestorProfile.findOne({
+                user: user._id
+            });
+        }
 
-        const profile =
-            await ProfileModel.findOneAndUpdate(
+        if (user.role === "Consultant") {
+            profile = await ConsultantProfile.findOne({
+                user: user._id
+            });
+        }
 
-                {
-                    user: userId
-                },
-
-                {
-                    user: userId,
-                    ...req.body
-                },
-
-                {
-                    new: true,
-                    upsert: true,
-                    runValidators: true
-                }
-            );
-
-
-        user.profileCompleted = true;
-
-        await user.save();
-
-
-        res.json({
-
+        return res.json({
             success: true,
-
-            message:
-                "Profile saved successfully",
-
+            user,
             profile
-
         });
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Get profile error:",
+            error
+        );
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Unable to save profile"
+            message: "Unable to fetch profile"
         });
     }
 };
 
 
-/* ================= GET MY PROFILE ================= */
+// ================= UPDATE PROFILE =================
 
-const getMyProfile = async (req, res) => {
-
+const updateProfile = async (req, res) => {
     try {
 
-        const userId = req.user.id;
+        const user = await User.findById(req.user.id);
 
-        const user =
-            await User.findById(userId);
-
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
 
         let ProfileModel;
 
-
-        if (user.role === "founder") {
-
-            ProfileModel =
-                FounderProfile;
-
-        } else if (user.role === "investor") {
-
-            ProfileModel =
-                InvestorProfile;
-
-        } else {
-
-            ProfileModel =
-                ConsultantProfile;
+        if (user.role === "Founder") {
+            ProfileModel = FounderProfile;
         }
 
+        if (user.role === "Investor") {
+            ProfileModel = InvestorProfile;
+        }
 
-        const profile =
-            await ProfileModel.findOne({
-                user: userId
-            });
+        if (user.role === "Consultant") {
+            ProfileModel = ConsultantProfile;
+        }
 
+        const profile = await ProfileModel.findOneAndUpdate(
+            {
+                user: user._id
+            },
+            {
+                user: user._id,
+                ...req.body
+            },
+            {
+                new: true,
+                upsert: true,
+                runValidators: true
+            }
+        );
 
-        res.json({
-
+        return res.json({
             success: true,
-
+            message: "Profile updated successfully",
             profile
-
         });
 
     } catch (error) {
 
-        res.status(500).json({
+        console.error(
+            "Update profile error:",
+            error
+        );
+
+        return res.status(500).json({
             success: false,
-            message: "Unable to load profile"
-        });
-    }
-};
-
-
-/* ================= DISCOVER PROFILES ================= */
-
-const getProfiles = async (req, res) => {
-
-    try {
-
-        const {
-            role
-        } = req.query;
-
-
-        let profiles;
-
-
-        if (role === "founder") {
-
-            profiles =
-                await FounderProfile
-                    .find()
-                    .populate(
-                        "user",
-                        "name email"
-                    );
-
-        } else if (role === "investor") {
-
-            profiles =
-                await InvestorProfile
-                    .find()
-                    .populate(
-                        "user",
-                        "name"
-                    );
-
-        } else if (role === "consultant") {
-
-            profiles =
-                await ConsultantProfile
-                    .find()
-                    .populate(
-                        "user",
-                        "name"
-                    );
-
-        } else {
-
-            return res.status(400).json({
-                success: false,
-                message: "Provide a valid role"
-            });
-        }
-
-
-        res.json({
-
-            success: true,
-
-            count: profiles.length,
-
-            profiles
-
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to load profiles"
+            message: "Unable to update profile"
         });
     }
 };
 
 
 module.exports = {
-    saveProfile,
-    getMyProfile,
-    getProfiles
+    getProfile,
+    updateProfile
 };
