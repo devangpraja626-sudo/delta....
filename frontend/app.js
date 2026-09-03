@@ -1,62 +1,39 @@
 /* =========================================
-   DELTA FRONTEND
-========================================= */
+   DELTA FRONTEND JAVASCRIPT
+   ========================================= */
 
-const API_URL =
-    "https://delta-admin-qdbu.onrender.com";
+/* ================= API ================= */
+
+const API_URL = "https://delta-admin-qdbu.onrender.com";
 
 
 /* ================= ELEMENTS ================= */
 
-const authModal =
-    document.getElementById("authModal");
+const authModal = document.getElementById("authModal");
+const authChoice = document.getElementById("authChoice");
+const registerForm = document.getElementById("registerForm");
+const loginFormWrap = document.getElementById("loginFormWrap");
+const continueButton = document.getElementById("continueButton");
 
-const authChoice =
-    document.getElementById("authChoice");
+const selectedRole = document.getElementById("selectedRole");
+const roleText = document.getElementById("roleText");
 
-const registerForm =
-    document.getElementById("registerForm");
+const registerMessage = document.getElementById("registerMessage");
+const loginMessage = document.getElementById("loginMessage");
 
-const loginFormWrap =
-    document.getElementById("loginFormWrap");
-
-const loginForm =
-    document.getElementById("loginFormWrap");
-
-const continueButton =
-    document.getElementById("continueButton");
-
-const selectedRole =
-    document.getElementById("selectedRole");
-
-const roleText =
-    document.getElementById("roleText");
-
-const registerMessage =
-    document.getElementById("registerMessage");
-
-const loginMessage =
-    document.getElementById("loginMessage");
-
-const landingPage =
-    document.getElementById("landingPage");
-
-const dashboardPage =
-    document.getElementById("dashboardPage");
-
+const landingPage = document.getElementById("landingPage");
+const dashboardPage = document.getElementById("dashboardPage");
 
 let selectedUserRole = null;
 
 
-/* ================= API HELPER ================= */
+/* =========================================
+   API HELPER
+   ========================================= */
 
-async function apiRequest(
-    endpoint,
-    options = {}
-) {
+async function apiRequest(endpoint, options = {}) {
 
-    const token =
-        localStorage.getItem("deltaToken");
+    const token = localStorage.getItem("deltaToken");
 
     const headers = {
         "Content-Type": "application/json",
@@ -64,48 +41,45 @@ async function apiRequest(
     };
 
     if (token) {
-        headers.Authorization =
-            `Bearer ${token}`;
+        headers.Authorization = `Bearer ${token}`;
     }
 
-    const response =
-        await fetch(
-            `${API_URL}${endpoint}`,
-            {
-                ...options,
-                headers
-            }
-        );
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers
+    });
 
-    const data =
-        await response.json()
-            .catch(() => ({}));
+    let data;
+
+    try {
+        data = await response.json();
+    } catch {
+        data = {
+            success: false,
+            message: "Invalid server response"
+        };
+    }
 
     if (!response.ok) {
-
-        throw new Error(
-            data.message ||
-            "Something went wrong"
-        );
+        throw new Error(data.message || "Something went wrong");
     }
 
     return data;
 }
 
 
-/* ================= AUTH MODAL ================= */
+/* =========================================
+   AUTH MODAL
+   ========================================= */
 
 function openJoin(role = null) {
 
+    if (!authModal) return;
+
     authModal.classList.add("active");
+    authModal.setAttribute("aria-hidden", "false");
 
-    authModal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-    document.body.style.overflow =
-        "hidden";
+    document.body.style.overflow = "hidden";
 
     showRoles();
 
@@ -117,14 +91,44 @@ function openJoin(role = null) {
 
 function closeJoin() {
 
-    authModal.classList.remove("active");
+    if (!authModal) return;
 
-    authModal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
+    authModal.classList.remove("active");
+    authModal.setAttribute("aria-hidden", "true");
 
     document.body.style.overflow = "";
+}
+
+
+function showRoles() {
+
+    if (authChoice) authChoice.classList.remove("hidden");
+    if (registerForm) registerForm.classList.add("hidden");
+    if (loginFormWrap) loginFormWrap.classList.add("hidden");
+}
+
+
+function showRegister() {
+
+    if (authChoice) authChoice.classList.add("hidden");
+    if (registerForm) registerForm.classList.remove("hidden");
+    if (loginFormWrap) loginFormWrap.classList.add("hidden");
+
+    if (registerMessage) {
+        registerMessage.textContent = "";
+    }
+}
+
+
+function showLogin() {
+
+    if (authChoice) authChoice.classList.add("hidden");
+    if (registerForm) registerForm.classList.add("hidden");
+    if (loginFormWrap) loginFormWrap.classList.remove("hidden");
+
+    if (loginMessage) {
+        loginMessage.textContent = "";
+    }
 }
 
 
@@ -132,221 +136,126 @@ function chooseRole(role) {
 
     selectedUserRole = role;
 
-    selectedRole.innerHTML =
-        `Selected role: <strong>${role}</strong>`;
-
-    continueButton.disabled = false;
-
-    document
-        .querySelectorAll(
-            ".role-select button"
-        )
-        .forEach(button => {
-
-            button.classList.remove(
-                "selected"
-            );
-
-            if (
-                button.dataset.role === role
-            ) {
-
-                button.classList.add(
-                    "selected"
-                );
-            }
-        });
-}
-
-
-function showRoles() {
-
-    authChoice.classList.remove(
-        "hidden"
-    );
-
-    registerForm.classList.add(
-        "hidden"
-    );
-
-    loginFormWrap.classList.add(
-        "hidden"
-    );
-}
-
-
-function showRegister() {
-
-    if (!selectedUserRole) {
-        return;
+    if (selectedRole) {
+        selectedRole.value = role;
     }
 
-    authChoice.classList.add(
-        "hidden"
-    );
+    if (roleText) {
+        roleText.textContent = role;
+    }
 
-    registerForm.classList.remove(
-        "hidden"
-    );
+    if (continueButton) {
+        continueButton.disabled = false;
+    }
 
-    loginFormWrap.classList.add(
-        "hidden"
-    );
+    document.querySelectorAll(".role-select button").forEach(button => {
 
-    roleText.textContent =
-        `Create your Delta account as a ${selectedUserRole}.`;
+        button.classList.remove("selected");
+
+        const buttonRole =
+            button.dataset.role ||
+            button.getAttribute("data-role");
+
+        if (buttonRole === role) {
+            button.classList.add("selected");
+        }
+    });
 }
 
 
-function showLogin() {
+/* =========================================
+   AUTH BUTTONS
+   ========================================= */
 
-    authChoice.classList.add(
-        "hidden"
-    );
+document.querySelectorAll("[data-role]").forEach(button => {
 
-    registerForm.classList.add(
-        "hidden"
-    );
+    button.addEventListener("click", function () {
 
-    loginFormWrap.classList.remove(
-        "hidden"
-    );
+        const role = this.dataset.role;
+
+        if (role) {
+            chooseRole(role);
+        }
+
+    });
+
+});
+
+
+if (continueButton) {
+
+    continueButton.addEventListener("click", function () {
+
+        if (!selectedUserRole) {
+            return;
+        }
+
+        showRegister();
+
+    });
+
 }
 
 
-/* ================= REGISTER ================= */
+/* =========================================
+   REGISTER
+   ========================================= */
 
-registerForm.addEventListener(
-    "submit",
-    async event => {
+if (registerForm) {
+
+    registerForm.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
-        registerMessage.textContent =
-            "Creating your account...";
-
-        registerMessage.className =
-            "form-message";
-
         const name =
-            document
-                .getElementById("name")
-                .value
-                .trim();
+            document.getElementById("registerName")?.value.trim();
 
         const email =
-            document
-                .getElementById("email")
-                .value
-                .trim();
+            document.getElementById("registerEmail")?.value.trim();
 
         const password =
-            document
-                .getElementById("password")
-                .value;
+            document.getElementById("registerPassword")?.value;
 
-        if (!selectedUserRole) {
+        const role =
+            selectedUserRole ||
+            document.getElementById("selectedRole")?.value;
 
-            registerMessage.textContent =
-                "Please select a role.";
+        if (!name || !email || !password || !role) {
+
+            if (registerMessage) {
+                registerMessage.textContent =
+                    "Please fill all fields.";
+            }
 
             return;
         }
 
-        try {
-
-            const data =
-                await apiRequest(
-                    "/api/auth/register",
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            name,
-                            email,
-                            password,
-                            role: selectedUserRole
-                        })
-                    }
-                );
-
-            localStorage.setItem(
-                "deltaToken",
-                data.token
-            );
-
-            localStorage.setItem(
-                "deltaUser",
-                JSON.stringify(data.user)
-            );
-
-            registerMessage.textContent =
-                "Account created successfully.";
-
-            registerMessage.className =
-                "form-message success";
-
-            registerForm.reset();
-
-            setTimeout(() => {
-
-                closeJoin();
-
-                openDashboard();
-
-            }, 700);
-
-        } catch (error) {
-
-            console.error(error);
-
-            registerMessage.textContent =
-                error.message;
-
-            registerMessage.className =
-                "form-message error";
+        if (registerMessage) {
+            registerMessage.textContent = "Creating your account...";
         }
-    }
-);
-
-
-/* ================= LOGIN ================= */
-
-loginForm.addEventListener(
-    "submit",
-    async event => {
-
-        event.preventDefault();
-
-        loginMessage.textContent =
-            "Signing you in...";
-
-        loginMessage.className =
-            "form-message";
-
-        const email =
-            document
-                .getElementById("loginEmail")
-                .value
-                .trim();
-
-        const password =
-            document
-                .getElementById("loginPassword")
-                .value;
 
         try {
 
-            const data =
-                await apiRequest(
-                    "/api/auth/login",
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            email,
-                            password
-                        })
-                    }
+            const data = await apiRequest("/api/auth/register", {
+
+                method: "POST",
+
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password,
+                    role
+                })
+
+            });
+
+
+            if (!data.success) {
+                throw new Error(
+                    data.message || "Registration failed"
                 );
+            }
+
 
             localStorage.setItem(
                 "deltaToken",
@@ -358,251 +267,418 @@ loginForm.addEventListener(
                 JSON.stringify(data.user)
             );
 
-            loginMessage.textContent =
-                "Login successful.";
 
-            loginMessage.className =
-                "form-message success";
+            if (registerMessage) {
+
+                registerMessage.textContent =
+                    "Account created successfully.";
+
+            }
+
 
             setTimeout(() => {
 
                 closeJoin();
-
                 openDashboard();
 
             }, 500);
 
+
         } catch (error) {
 
-            console.error(error);
+            if (registerMessage) {
 
-            loginMessage.textContent =
-                error.message;
+                registerMessage.textContent =
+                    error.message;
 
-            loginMessage.className =
-                "form-message error";
+            }
+
         }
-    }
-);
+
+    });
+
+}
 
 
-/* ================= DASHBOARD ================= */
+/* =========================================
+   LOGIN
+   ========================================= */
+
+if (loginFormWrap) {
+
+    loginFormWrap.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+
+        const email =
+            document.getElementById("loginEmail")?.value.trim();
+
+        const password =
+            document.getElementById("loginPassword")?.value;
+
+
+        if (!email || !password) {
+
+            if (loginMessage) {
+                loginMessage.textContent =
+                    "Please enter email and password.";
+            }
+
+            return;
+        }
+
+
+        if (loginMessage) {
+            loginMessage.textContent =
+                "Logging in...";
+        }
+
+
+        try {
+
+            const data = await apiRequest("/api/auth/login", {
+
+                method: "POST",
+
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+
+            });
+
+
+            if (!data.success) {
+                throw new Error(
+                    data.message || "Login failed"
+                );
+            }
+
+
+            localStorage.setItem(
+                "deltaToken",
+                data.token
+            );
+
+            localStorage.setItem(
+                "deltaUser",
+                JSON.stringify(data.user)
+            );
+
+
+            if (loginMessage) {
+
+                loginMessage.textContent =
+                    "Login successful.";
+
+            }
+
+
+            setTimeout(() => {
+
+                closeJoin();
+                openDashboard();
+
+            }, 400);
+
+
+        } catch (error) {
+
+            if (loginMessage) {
+
+                loginMessage.textContent =
+                    error.message;
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* =========================================
+   CURRENT USER
+   ========================================= */
 
 function getCurrentUser() {
 
     const raw =
-        localStorage.getItem(
-            "deltaUser"
-        );
+        localStorage.getItem("deltaUser");
 
-    if (!raw) return null;
-
-    try {
-        return JSON.parse(raw);
-    } catch {
+    if (!raw) {
         return null;
     }
+
+    try {
+
+        return JSON.parse(raw);
+
+    } catch {
+
+        return null;
+
+    }
+
 }
 
 
+/* =========================================
+   OPEN DASHBOARD
+   ========================================= */
+
 function openDashboard() {
 
-    const user =
-        getCurrentUser();
+    const user = getCurrentUser();
 
     if (!user) {
         return;
     }
 
-    landingPage.classList.add(
-        "hidden"
-    );
 
-    dashboardPage.classList.remove(
-        "hidden"
-    );
+    if (landingPage) {
+        landingPage.classList.add("hidden");
+    }
+
+
+    if (dashboardPage) {
+        dashboardPage.classList.remove("hidden");
+    }
+
 
     document.body.style.overflow = "";
 
-    document.getElementById(
-        "dashboardGreeting"
-    ).textContent =
-        `Welcome, ${user.name}.`;
 
-    document.getElementById(
-        "userBadge"
-    ).textContent =
-        user.role;
+    const greeting =
+        document.getElementById("dashboardGreeting");
 
-    showDashboardSection(
-        "dashboard"
-    );
+    const badge =
+        document.getElementById("userBadge");
+
+
+    if (greeting) {
+
+        greeting.textContent =
+            `Welcome, ${user.name}.`;
+
+    }
+
+
+    if (badge) {
+
+        badge.textContent =
+            user.role;
+
+    }
+
+
+    showDashboardSection("dashboard");
 
     loadDashboard();
+
 }
 
 
-function closeDashboard() {
+/* =========================================
+   DASHBOARD SECTIONS
+   ========================================= */
 
-    dashboardPage.classList.add(
-        "hidden"
-    );
+function showDashboardSection(section) {
 
-    landingPage.classList.remove(
-        "hidden"
-    );
+    document.querySelectorAll(".dash-section").forEach(item => {
 
-    window.scrollTo(
-        0,
-        0
-    );
-}
+        item.classList.add("hidden");
 
+    });
 
-function showDashboardSection(
-    section
-) {
-
-    document
-        .querySelectorAll(
-            ".dash-section"
-        )
-        .forEach(element => {
-
-            element.classList.add(
-                "hidden"
-            );
-        });
 
     const target =
         document.getElementById(
             `section-${section}`
         );
 
+
     if (target) {
-        target.classList.remove(
-            "hidden"
-        );
+
+        target.classList.remove("hidden");
+
     }
 
-    document
-        .querySelectorAll(
-            ".side-link"
-        )
-        .forEach(button => {
 
-            button.classList.remove(
-                "active"
-            );
+    document.querySelectorAll(".side-link").forEach(link => {
 
-            if (
-                button.dataset.section ===
-                section
-            ) {
+        link.classList.remove("active");
 
-                button.classList.add(
-                    "active"
-                );
-            }
-        });
+        if (
+            link.dataset.section === section
+        ) {
 
+            link.classList.add("active");
 
-    if (section === "profile") {
-        loadProfile();
-    }
+        }
 
-    if (section === "pitches") {
-        loadMyPitches();
-    }
-
-    if (section === "discover") {
-        loadDiscover();
-    }
-
-    if (section === "connections") {
-        loadConnections();
-    }
-}
-
-
-/* ================= SIDEBAR ================= */
-
-document
-    .querySelectorAll(".side-link")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const section =
-                    button.dataset.section;
-
-                if (section) {
-                    showDashboardSection(
-                        section
-                    );
-                }
-            }
-        );
     });
 
 
-/* ================= PROFILE ================= */
+    if (section === "profile") {
+
+        loadProfile();
+
+    }
+
+    if (section === "pitches") {
+
+        loadMyPitches();
+
+    }
+
+    if (section === "discover") {
+
+        loadDiscover();
+
+    }
+
+    if (section === "connections") {
+
+        loadConnections();
+
+    }
+
+}
+
+
+/* =========================================
+   SIDEBAR NAVIGATION
+   ========================================= */
+
+document.querySelectorAll(".side-link").forEach(link => {
+
+    link.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        const section =
+            this.dataset.section;
+
+        if (section) {
+
+            showDashboardSection(section);
+
+        }
+
+    });
+
+});
+
+
+/* =========================================
+   DASHBOARD OVERVIEW
+   ========================================= */
+
+async function loadDashboard() {
+
+    try {
+
+        await Promise.all([
+            loadProfile(),
+            loadMyPitches(),
+            loadConnections()
+        ]);
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   PROFILE
+   ========================================= */
 
 async function loadProfile() {
 
     try {
 
         const data =
-            await apiRequest(
-                "/api/profiles/me"
-            );
+            await apiRequest("/api/profiles/me");
+
 
         const user =
-            data.user;
+            data.user || getCurrentUser();
 
         const profile =
             data.profile || {};
 
-        document.getElementById(
-            "profileName"
-        ).value =
-            user.name || "";
 
-        document.getElementById(
-            "startupName"
-        ).value =
-            profile.startupName || "";
+        const profileName =
+            document.getElementById("profileName");
 
-        document.getElementById(
-            "industry"
-        ).value =
-            profile.industry || "";
+        const startupName =
+            document.getElementById("startupName");
 
-        document.getElementById(
-            "location"
-        ).value =
-            profile.location || "";
+        const industry =
+            document.getElementById("industry");
 
-        document.getElementById(
-            "stage"
-        ).value =
-            profile.stage || "";
+        const location =
+            document.getElementById("location");
 
-        document.getElementById(
-            "website"
-        ).value =
-            profile.website || "";
+        const stage =
+            document.getElementById("stage");
 
-        document.getElementById(
-            "bio"
-        ).value =
-            profile.bio || "";
+        const website =
+            document.getElementById("website");
+
+        const bio =
+            document.getElementById("bio");
+
+
+        if (profileName) {
+            profileName.value =
+                user?.name || "";
+        }
+
+        if (startupName) {
+            startupName.value =
+                profile.startupName || "";
+        }
+
+        if (industry) {
+            industry.value =
+                profile.industry || "";
+        }
+
+        if (location) {
+            location.value =
+                profile.location || "";
+        }
+
+        if (stage) {
+            stage.value =
+                profile.stage || "";
+        }
+
+        if (website) {
+            website.value =
+                profile.website || "";
+        }
+
+        if (bio) {
+            bio.value =
+                profile.bio || "";
+        }
+
 
         let completed = 0;
 
-        const fields = [
+        const requiredFields = [
             profile.startupName,
             profile.industry,
             profile.location,
@@ -610,16 +686,38 @@ async function loadProfile() {
             profile.bio
         ];
 
-        fields.forEach(value => {
-            if (value) completed++;
+
+        requiredFields.forEach(field => {
+
+            if (
+                field &&
+                String(field).trim() !== ""
+            ) {
+
+                completed++;
+
+            }
+
         });
 
-        document.getElementById(
-            "profileStatus"
-        ).textContent =
-            `${Math.round(
-                completed / fields.length * 100
-            )}%`;
+
+        const percentage =
+            Math.round(
+                (completed / requiredFields.length) * 100
+            );
+
+
+        const profileStatus =
+            document.getElementById("profileStatus");
+
+
+        if (profileStatus) {
+
+            profileStatus.textContent =
+                `${percentage}%`;
+
+        }
+
 
     } catch (error) {
 
@@ -627,342 +725,473 @@ async function loadProfile() {
             "Profile error:",
             error
         );
+
     }
+
 }
 
 
-document
-    .getElementById("profileForm")
-    .addEventListener(
-        "submit",
-        async event => {
+/* =========================================
+   UPDATE PROFILE
+   ========================================= */
 
-            event.preventDefault();
+const profileForm =
+    document.getElementById("profileForm");
 
-            const message =
-                document.getElementById(
-                    "profileMessage"
-                );
 
-            try {
+if (profileForm) {
 
-                const data =
-                    await apiRequest(
-                        "/api/profiles/me",
-                        {
-                            method: "PUT",
-                            body: JSON.stringify({
+    profileForm.addEventListener("submit", async function (event) {
 
-                                startupName:
-                                    document.getElementById(
-                                        "startupName"
-                                    ).value.trim(),
+        event.preventDefault();
 
-                                industry:
-                                    document.getElementById(
-                                        "industry"
-                                    ).value.trim(),
 
-                                location:
-                                    document.getElementById(
-                                        "location"
-                                    ).value.trim(),
+        const profileMessage =
+            document.getElementById("profileMessage");
 
-                                stage:
-                                    document.getElementById(
-                                        "stage"
-                                    ).value,
 
-                                website:
-                                    document.getElementById(
-                                        "website"
-                                    ).value.trim(),
+        const body = {
 
-                                bio:
-                                    document.getElementById(
-                                        "bio"
-                                    ).value.trim()
+            startupName:
+                document.getElementById("startupName")?.value.trim() || "",
 
-                            })
-                        }
-                    );
+            industry:
+                document.getElementById("industry")?.value.trim() || "",
 
-                message.textContent =
-                    data.message;
+            location:
+                document.getElementById("location")?.value.trim() || "",
 
-                message.className =
-                    "form-message success";
+            stage:
+                document.getElementById("stage")?.value.trim() || "",
 
-                loadProfile();
+            website:
+                document.getElementById("website")?.value.trim() || "",
 
-            } catch (error) {
+            bio:
+                document.getElementById("bio")?.value.trim() || ""
 
-                message.textContent =
+        };
+
+
+        if (profileMessage) {
+
+            profileMessage.textContent =
+                "Saving profile...";
+
+        }
+
+
+        try {
+
+            await apiRequest("/api/profiles/me", {
+
+                method: "PUT",
+
+                body: JSON.stringify(body)
+
+            });
+
+
+            if (profileMessage) {
+
+                profileMessage.textContent =
+                    "Profile updated successfully.";
+
+            }
+
+
+            await loadProfile();
+
+
+        } catch (error) {
+
+            if (profileMessage) {
+
+                profileMessage.textContent =
                     error.message;
 
-                message.className =
-                    "form-message error";
             }
+
         }
-    );
+
+    });
+
+}
 
 
-/* ================= CREATE PITCH ================= */
+/* =========================================
+   CREATE PITCH
+   ========================================= */
 
-document
-    .getElementById("pitchForm")
-    .addEventListener(
-        "submit",
-        async event => {
+const pitchForm =
+    document.getElementById("pitchForm");
 
-            event.preventDefault();
 
-            const message =
-                document.getElementById(
-                    "pitchMessage"
+if (pitchForm) {
+
+    pitchForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+
+        const pitchMessage =
+            document.getElementById("pitchMessage");
+
+
+        const body = {
+
+            title:
+                document.getElementById("pitchTitle")?.value.trim() || "",
+
+            description:
+                document.getElementById("pitchDescription")?.value.trim() || "",
+
+            industry:
+                document.getElementById("pitchIndustry")?.value.trim() || "",
+
+            stage:
+                document.getElementById("pitchStage")?.value.trim() || "",
+
+            fundingRequired:
+                document.getElementById("fundingRequired")?.value || 0,
+
+            website:
+                document.getElementById("pitchWebsite")?.value.trim() || "",
+
+            status:
+                document.getElementById("pitchStatus")?.value || "Draft"
+
+        };
+
+
+        if (!body.title || !body.description) {
+
+            if (pitchMessage) {
+
+                pitchMessage.textContent =
+                    "Title and description are required.";
+
+            }
+
+            return;
+
+        }
+
+
+        if (pitchMessage) {
+
+            pitchMessage.textContent =
+                "Creating pitch...";
+
+        }
+
+
+        try {
+
+            const data =
+                await apiRequest("/api/pitches", {
+
+                    method: "POST",
+
+                    body: JSON.stringify(body)
+
+                });
+
+
+            if (!data.success) {
+
+                throw new Error(
+                    data.message || "Pitch creation failed"
                 );
 
-            try {
+            }
 
-                const data =
-                    await apiRequest(
-                        "/api/pitches",
-                        {
-                            method: "POST",
-                            body: JSON.stringify({
 
-                                title:
-                                    document.getElementById(
-                                        "pitchTitle"
-                                    ).value.trim(),
+            if (pitchMessage) {
 
-                                description:
-                                    document.getElementById(
-                                        "pitchDescription"
-                                    ).value.trim(),
+                pitchMessage.textContent =
+                    "Pitch created successfully.";
 
-                                industry:
-                                    document.getElementById(
-                                        "pitchIndustry"
-                                    ).value.trim(),
+            }
 
-                                stage:
-                                    document.getElementById(
-                                        "pitchStage"
-                                    ).value,
 
-                                fundingRequired:
-                                    document.getElementById(
-                                        "fundingRequired"
-                                    ).value.trim(),
+            pitchForm.reset();
 
-                                website:
-                                    document.getElementById(
-                                        "pitchWebsite"
-                                    ).value.trim(),
+            await loadMyPitches();
 
-                                status:
-                                    document.getElementById(
-                                        "pitchStatus"
-                                    ).value
 
-                            })
-                        }
-                    );
+        } catch (error) {
 
-                message.textContent =
-                    data.message;
+            if (pitchMessage) {
 
-                message.className =
-                    "form-message success";
-
-                document
-                    .getElementById(
-                        "pitchForm"
-                    )
-                    .reset();
-
-                loadMyPitches();
-
-            } catch (error) {
-
-                message.textContent =
+                pitchMessage.textContent =
                     error.message;
 
-                message.className =
-                    "form-message error";
             }
+
         }
-    );
+
+    });
+
+}
 
 
-/* ================= MY PITCHES ================= */
+/* =========================================
+   MY PITCHES
+   ========================================= */
 
 async function loadMyPitches() {
 
     const container =
-        document.getElementById(
-            "myPitches"
-        );
+        document.getElementById("myPitches");
+
+
+    if (!container) {
+        return;
+    }
+
 
     container.innerHTML =
         "<p>Loading pitches...</p>";
 
+
     try {
 
         const data =
-            await apiRequest(
-                "/api/pitches/my"
-            );
+            await apiRequest("/api/pitches/my");
 
-        document.getElementById(
-            "pitchCount"
-        ).textContent =
-            data.pitches.length;
 
-        if (!data.pitches.length) {
+        const pitches =
+            data.pitches || [];
+
+
+        const pitchCount =
+            document.getElementById("pitchCount");
+
+
+        if (pitchCount) {
+
+            pitchCount.textContent =
+                pitches.length;
+
+        }
+
+
+        if (pitches.length === 0) {
 
             container.innerHTML = `
-                <div class="content-card">
-                    <h3>No pitches yet.</h3>
+                <div class="empty-state">
+                    <h3>No pitches yet</h3>
                     <p>Create your first startup pitch.</p>
                 </div>
             `;
 
             return;
+
         }
 
+
         container.innerHTML =
-            data.pitches
-                .map(pitch => `
+            pitches.map(pitch => `
 
-                    <div class="content-card">
+                <div class="pitch-card">
 
-                        <span class="small-label">
-                            ${pitch.status}
+                    <div class="pitch-card-top">
+
+                        <span class="status-badge">
+                            ${escapeHTML(pitch.status || "Draft")}
                         </span>
-
-                        <h3>
-                            ${escapeHTML(
-                                pitch.title
-                            )}
-                        </h3>
-
-                        <p>
-                            ${escapeHTML(
-                                pitch.description
-                            )}
-                        </p>
-
-                        <p>
-                            ${escapeHTML(
-                                pitch.industry || ""
-                            )}
-                        </p>
 
                     </div>
 
-                `)
-                .join("");
+                    <h3>
+                        ${escapeHTML(pitch.title || "Untitled Pitch")}
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(
+                            pitch.description || ""
+                        )}
+                    </p>
+
+                    <div class="pitch-meta">
+
+                        <span>
+                            ${escapeHTML(
+                                pitch.industry || "—"
+                            )}
+                        </span>
+
+                        <span>
+                            ${escapeHTML(
+                                pitch.stage || "—"
+                            )}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `).join("");
+
 
     } catch (error) {
 
-        container.innerHTML =
-            `<p>${error.message}</p>`;
+        container.innerHTML = `
+            <p class="error-message">
+                ${escapeHTML(error.message)}
+            </p>
+        `;
+
     }
+
 }
 
 
-/* ================= DISCOVER ================= */
+/* =========================================
+   DISCOVER
+   ========================================= */
 
 async function loadDiscover() {
 
-    const role =
-        document.getElementById(
-            "discoverRole"
-        ).value;
-
     const container =
-        document.getElementById(
-            "discoverUsers"
-        );
+        document.getElementById("discoverUsers");
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const roleSelect =
+        document.getElementById("discoverRole");
+
+
+    const role =
+        roleSelect?.value || "";
+
 
     container.innerHTML =
-        "<p>Discovering people...</p>";
+        "<p>Loading people...</p>";
+
 
     try {
 
-        const endpoint =
-            role
-                ? `/api/connections/discover?role=${encodeURIComponent(role)}`
-                : "/api/connections/discover";
+        let endpoint =
+            "/api/connections/discover";
 
-        const data =
-            await apiRequest(
-                endpoint
-            );
 
-        if (!data.users.length) {
+        if (role) {
 
-            container.innerHTML =
-                "<p>No people found.</p>";
+            endpoint +=
+                `?role=${encodeURIComponent(role)}`;
 
-            return;
         }
 
+
+        const data =
+            await apiRequest(endpoint);
+
+
+        const users =
+            data.users || [];
+
+
+        if (users.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>No people found</h3>
+                    <p>Try another role.</p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
         container.innerHTML =
-            data.users
-                .map(user => `
+            users.map(user => `
 
-                    <div class="content-card">
+                <div class="discover-card">
 
-                        <span class="small-label">
-                            ${escapeHTML(user.role)}
-                        </span>
+                    <div>
 
                         <h3>
-                            ${escapeHTML(user.name)}
+                            ${escapeHTML(
+                                user.name || "Delta Member"
+                            )}
                         </h3>
 
                         <p>
-                            ${escapeHTML(user.email)}
+                            ${escapeHTML(
+                                user.role || ""
+                            )}
                         </p>
 
-                        <div class="card-actions">
-
-                            <button
-                                class="button button-light"
-                                onclick="connectUser('${user._id}')"
-                            >
-                                Connect →
-                            </button>
-
-                        </div>
+                        ${
+                            user.email
+                                ? `<small>${escapeHTML(user.email)}</small>`
+                                : ""
+                        }
 
                     </div>
 
-                `)
-                .join("");
+                    <button
+                        class="btn btn-primary"
+                        onclick="connectUser('${user._id}')"
+                    >
+                        Connect
+                    </button>
+
+                </div>
+
+            `).join("");
+
 
     } catch (error) {
 
-        container.innerHTML =
-            `<p>${error.message}</p>`;
+        container.innerHTML = `
+            <p class="error-message">
+                ${escapeHTML(error.message)}
+            </p>
+        `;
+
     }
+
 }
 
 
-document
-    .getElementById("discoverRole")
-    .addEventListener(
-        "change",
-        loadDiscover
-    );
+/* =========================================
+   DISCOVER FILTER
+   ========================================= */
+
+const discoverRole =
+    document.getElementById("discoverRole");
 
 
-/* ================= CONNECT ================= */
+if (discoverRole) {
+
+    discoverRole.addEventListener("change", function () {
+
+        loadDiscover();
+
+    });
+
+}
+
+
+/* =========================================
+   SEND CONNECTION
+   ========================================= */
 
 async function connectUser(userId) {
+
+    if (!userId) {
+        return;
+    }
+
 
     try {
 
@@ -974,327 +1203,333 @@ async function connectUser(userId) {
                 }
             );
 
+
         alert(
-            data.message
+            data.message ||
+            "Connection request sent."
         );
 
-        loadDiscover();
+
+        await loadDiscover();
+
+        await loadConnections();
+
 
     } catch (error) {
 
-        alert(
-            error.message
-        );
+        alert(error.message);
+
     }
+
 }
 
 
-/* ================= CONNECTIONS ================= */
+/* =========================================
+   CONNECTIONS
+   ========================================= */
 
 async function loadConnections() {
 
     const container =
-        document.getElementById(
-            "connectionsList"
-        );
+        document.getElementById("connectionsList");
+
+
+    if (!container) {
+        return;
+    }
+
 
     container.innerHTML =
         "<p>Loading connections...</p>";
 
+
     try {
 
         const data =
-            await apiRequest(
-                "/api/connections"
-            );
+            await apiRequest("/api/connections");
+
 
         const connections =
-            data.connections;
+            data.connections || [];
 
-        document.getElementById(
-            "connectionCount"
-        ).textContent =
-            connections.filter(
-                connection =>
-                    connection.status ===
-                    "accepted"
-            ).length;
 
-        if (!connections.length) {
+        const connectionCount =
+            document.getElementById("connectionCount");
 
-            container.innerHTML = `
-                <div class="content-card">
-                    <h3>Your network starts here.</h3>
-                    <p>
-                        Discover founders, investors
-                        and consultants.
-                    </p>
-                </div>
-            `;
-
-            return;
-        }
 
         const currentUser =
             getCurrentUser();
 
+
+        const acceptedConnections =
+            connections.filter(
+                connection =>
+                    connection.status === "accepted"
+            );
+
+
+        if (connectionCount) {
+
+            connectionCount.textContent =
+                acceptedConnections.length;
+
+        }
+
+
+        if (connections.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>No connections yet</h3>
+                    <p>Discover founders, investors and consultants.</p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
         container.innerHTML =
-            connections
-                .map(connection => {
+            connections.map(connection => {
 
-                    const other =
-                        connection.sender._id ===
-                        currentUser.id
-                            ? connection.receiver
-                            : connection.sender;
+                const sender =
+                    connection.sender || {};
 
-                    let actions = "";
+                const receiver =
+                    connection.receiver || {};
 
-                    if (
-                        connection.status ===
-                        "pending" &&
-                        connection.receiver._id ===
-                        currentUser.id
-                    ) {
 
-                        actions = `
+                const currentId =
+                    String(currentUser?.id || "");
 
-                            <div class="card-actions">
 
-                                <button
-                                    class="button button-light"
-                                    onclick="acceptConnection('${connection._id}')"
-                                >
-                                    Accept
-                                </button>
+                const senderId =
+                    String(sender._id || "");
 
-                                <button
-                                    class="button"
-                                    onclick="rejectConnection('${connection._id}')"
-                                >
-                                    Reject
-                                </button>
 
-                            </div>
+                const receiverId =
+                    String(receiver._id || "");
 
-                        `;
-                    }
 
-                    return `
+                const otherUser =
+                    senderId === currentId
+                        ? receiver
+                        : sender;
 
-                        <div class="content-card">
 
-                            <span class="small-label">
-                                ${connection.status}
-                            </span>
+                let actions = "";
+
+
+                if (
+                    connection.status === "pending" &&
+                    receiverId === currentId
+                ) {
+
+                    actions = `
+
+                        <button
+                            class="btn btn-primary"
+                            onclick="acceptConnection('${connection._id}')"
+                        >
+                            Accept
+                        </button>
+
+                        <button
+                            class="btn btn-secondary"
+                            onclick="rejectConnection('${connection._id}')"
+                        >
+                            Reject
+                        </button>
+
+                    `;
+
+                }
+
+
+                return `
+
+                    <div class="connection-card">
+
+                        <div>
 
                             <h3>
                                 ${escapeHTML(
-                                    other.name
+                                    otherUser.name ||
+                                    "Delta Member"
                                 )}
                             </h3>
 
                             <p>
                                 ${escapeHTML(
-                                    other.role
+                                    otherUser.role ||
+                                    ""
                                 )}
                             </p>
+
+                            <span class="status-badge">
+                                ${escapeHTML(
+                                    connection.status ||
+                                    "pending"
+                                )}
+                            </span>
+
+                        </div>
+
+                        <div class="connection-actions">
 
                             ${actions}
 
                         </div>
 
-                    `;
+                    </div>
 
-                })
-                .join("");
+                `;
+
+            }).join("");
+
 
     } catch (error) {
 
-        container.innerHTML =
-            `<p>${error.message}</p>`;
+        container.innerHTML = `
+            <p class="error-message">
+                ${escapeHTML(error.message)}
+            </p>
+        `;
+
     }
+
 }
 
 
-/* ================= ACCEPT ================= */
+/* =========================================
+   ACCEPT CONNECTION
+   ========================================= */
 
-async function acceptConnection(id) {
+async function acceptConnection(connectionId) {
 
     try {
 
         const data =
             await apiRequest(
-                `/api/connections/${id}/accept`,
+                `/api/connections/${connectionId}/accept`,
                 {
                     method: "PUT"
                 }
             );
 
+
         alert(
-            data.message
+            data.message ||
+            "Connection accepted."
         );
 
-        loadConnections();
+
+        await loadConnections();
+
 
     } catch (error) {
 
-        alert(
-            error.message
-        );
+        alert(error.message);
+
     }
+
 }
 
 
-/* ================= REJECT ================= */
+/* =========================================
+   REJECT CONNECTION
+   ========================================= */
 
-async function rejectConnection(id) {
+async function rejectConnection(connectionId) {
 
     try {
 
         const data =
             await apiRequest(
-                `/api/connections/${id}/reject`,
+                `/api/connections/${connectionId}/reject`,
                 {
                     method: "PUT"
                 }
             );
 
+
         alert(
-            data.message
+            data.message ||
+            "Connection rejected."
         );
 
-        loadConnections();
+
+        await loadConnections();
+
 
     } catch (error) {
 
-        alert(
-            error.message
-        );
+        alert(error.message);
+
     }
+
 }
 
 
-/* ================= DASHBOARD LOAD ================= */
+/* =========================================
+   LOGOUT
+   ========================================= */
 
-async function loadDashboard() {
+function logout() {
 
-    await loadProfile();
+    localStorage.removeItem("deltaToken");
+    localStorage.removeItem("deltaUser");
 
-    await loadMyPitches();
+    if (dashboardPage) {
+        dashboardPage.classList.add("hidden");
+    }
 
-    await loadConnections();
+    if (landingPage) {
+        landingPage.classList.remove("hidden");
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
 }
 
 
-/* ================= LOGOUT ================= */
-
-document
-    .getElementById("logoutButton")
-    .addEventListener(
-        "click",
-        () => {
-
-            localStorage.removeItem(
-                "deltaToken"
-            );
-
-            localStorage.removeItem(
-                "deltaUser"
-            );
-
-            closeDashboard();
-
-        }
-    );
-
-
-/* ================= TOP LOGIN ================= */
-
-document
-    .getElementById("loginTop")
-    .addEventListener(
-        "click",
-        () => {
-
-            openJoin();
-
-            showLogin();
-
-        }
-    );
-
-
-/* ================= MODAL ================= */
-
-authModal.addEventListener(
-    "click",
-    event => {
-
-        if (
-            event.target ===
-            authModal
-        ) {
-
-            closeJoin();
-
-        }
-    }
-);
-
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            closeJoin();
-
-        }
-    }
-);
-
-
-/* ================= SECURITY ================= */
+/* =========================================
+   ESCAPE HTML
+   ========================================= */
 
 function escapeHTML(value) {
 
-    return String(
-        value || ""
-    )
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
-
-/* ================= AUTO LOGIN ================= */
-
-if (
-    localStorage.getItem(
-        "deltaToken"
-    ) &&
-    getCurrentUser()
-) {
-
-    openDashboard();
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
 }
 
 
-/* ================= CONSOLE ================= */
+/* =========================================
+   AUTO LOGIN
+   ========================================= */
 
-console.log(
-    "%cDELTA",
-    "font-size:32px;font-weight:700;letter-spacing:8px;"
-);
+document.addEventListener("DOMContentLoaded", function () {
 
-console.log(
-    "API:",
-    API_URL
-);
+    const user =
+        getCurrentUser();
+
+    const token =
+        localStorage.getItem("deltaToken");
+
+
+    if (user && token) {
+
+        openDashboard();
+
+    }
+
+});
