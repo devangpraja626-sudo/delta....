@@ -233,10 +233,9 @@ registerForm.addEventListener(
 
 
         try {
-
-            const response =
-                await fetch(
-                    `${API_URL}/api/auth/signup`,
+         const response =
+           await fetch(
+        `${API_URL}/api/auth/register`,
                     {
                         method: "POST",
 
