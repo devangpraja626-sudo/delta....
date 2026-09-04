@@ -2,22 +2,18 @@ const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema(
     {
-        conversation: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Conversation",
-            required: true
-        },
-
         sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true
+            required: true,
+            index: true
         },
 
         receiver: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true
+            required: true,
+            index: true
         },
 
         text: {
@@ -36,6 +32,12 @@ const messageSchema = new mongoose.Schema(
         timestamps: true
     }
 );
+
+messageSchema.index({
+    sender: 1,
+    receiver: 1,
+    createdAt: 1
+});
 
 module.exports = mongoose.model(
     "Message",
