@@ -9,6 +9,19 @@ const founderProfileSchema = new mongoose.Schema(
             unique: true
         },
 
+        profilePhoto: {
+            type: String,
+            trim: true,
+            default: ""
+        },
+
+        startup: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Startup",
+            default: null
+        },
+
+        // Kept for compatibility with the existing Delta system
         startupName: {
             type: String,
             trim: true,
