@@ -11,6 +11,9 @@ const profileRoutes = require("./routes/profileRoutes");
 const pitchRoutes = require("./routes/pitchRoutes");
 const connectionRoutes = require("./routes/connectionRoutes");
 const postRoutes = require("./routes/postRoutes");
+const messageRoutes = require(
+    "./routes/messageRoutes"
+);
 
 const app = express();
 
@@ -106,7 +109,10 @@ app.use(
     "/api/posts",
     postRoutes
 );
-
+app.use(
+    "/api/messages",
+    messageRoutes
+);
 
 // ================= 404 =================
 
