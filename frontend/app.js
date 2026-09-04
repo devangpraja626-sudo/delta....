@@ -703,7 +703,7 @@ if (pitchForm) {
             stage: getValue("pitchStage"),
             fundingRequired: getValue("fundingRequired"),
             website: getValue("pitchWebsite"),
-            status: getValue("pitchStatus"),
+           
             description: getValue("pitchDescription")
         };
 
