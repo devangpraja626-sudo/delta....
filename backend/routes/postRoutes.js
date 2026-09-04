@@ -13,8 +13,7 @@ const founderMiddleware = require("../middleware/founderMiddleware");
 const router = express.Router();
 
 
-// ================= FOUNDER FEED =================
-
+// Founder Feed
 router.get(
     "/feed",
     authMiddleware,
@@ -23,8 +22,7 @@ router.get(
 );
 
 
-// ================= CREATE POST =================
-
+// Create Post
 router.post(
     "/",
     authMiddleware,
@@ -33,8 +31,7 @@ router.post(
 );
 
 
-// ================= LIKE / UNLIKE =================
-
+// Like / Unlike
 router.post(
     "/:id/like",
     authMiddleware,
@@ -43,8 +40,7 @@ router.post(
 );
 
 
-// ================= SINGLE POST =================
-
+// Get Single Post
 router.get(
     "/:id",
     authMiddleware,
