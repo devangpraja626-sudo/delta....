@@ -83,25 +83,11 @@ app.get("/health", (req, res) => {
 
 // ================= API =================
 
-app.use(
-    "/api/auth",
-    authRoutes
-);
-
-app.use(
-    "/api/profiles",
-    profileRoutes
-);
-
-app.use(
-    "/api/pitches",
-    pitchRoutes
-);
-
-app.use(
-    "/api/connections",
-    connectionRoutes
-);
+app.use("/api/auth", authRoutes);
+app.use("/api/profiles", profileRoutes);
+app.use("/api/pitches", pitchRoutes);
+app.use("/api/connections", connectionRoutes);
+app.use("/api/startups", startupRoutes);
 
 
 // ================= 404 =================
