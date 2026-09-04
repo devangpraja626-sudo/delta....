@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const pitchRoutes = require("./routes/pitchRoutes");
 const connectionRoutes = require("./routes/connectionRoutes");
+const postRoutes = require("./routes/postRoutes");
 
 const app = express();
 
@@ -100,6 +101,10 @@ app.use(
 app.use(
     "/api/connections",
     connectionRoutes
+);
+app.use(
+    "/api/posts",
+    postRoutes
 );
 
 
