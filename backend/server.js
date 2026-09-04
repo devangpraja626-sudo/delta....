@@ -13,6 +13,7 @@ const connectionRoutes = require("./routes/connectionRoutes");
 const startupRoutes = require("./routes/startupRoutes");
 const postRoutes = require("./routes/postRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const groupRoutes = require("./routes/groupRoutes");
 
 const app = express();
 
