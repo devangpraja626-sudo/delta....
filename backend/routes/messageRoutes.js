@@ -13,7 +13,8 @@ const authMiddleware = require(
 const router = express.Router();
 
 
-// Get all my conversations
+// IMPORTANT:
+// Keep /conversations BEFORE /:userId
 
 router.get(
     "/conversations",
@@ -22,16 +23,12 @@ router.get(
 );
 
 
-// Get messages with a specific user
-
 router.get(
     "/:userId",
     authMiddleware,
     getConversation
 );
 
-
-// Send message to a specific user
 
 router.post(
     "/:userId",
