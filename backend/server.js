@@ -89,6 +89,7 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/pitches", pitchRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/startups", startupRoutes);
+app.use("/api/posts", postRoutes);
 
 
 // ================= 404 =================
