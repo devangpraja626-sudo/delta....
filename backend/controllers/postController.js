@@ -1,5 +1,4 @@
 const Post = require("../models/Post");
-const User = require("../models/User");
 
 
 // ================= CREATE POST =================
@@ -145,3 +144,23 @@ const getPost = async (req, res) => {
             success: true,
             post
         });
+
+    } catch (error) {
+        console.error("Get post error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to fetch post"
+        });
+    }
+};
+
+
+// ================= EXPORTS =================
+
+module.exports = {
+    createPost,
+    getFounderFeed,
+    toggleLike,
+    getPost
+};
