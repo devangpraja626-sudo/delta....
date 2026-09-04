@@ -2,18 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>Delta — Entrepreneurship Without Borders</title>
 
     <meta
         name="description"
-        content="Delta — Entrepreneurship, without borders."
+        content="Delta — The ecosystem for founders, investors and consultants. Turn ideas into businesses."
     >
-
-    <title>Delta — Entrepreneurship, without borders</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,10 +19,7 @@
         rel="stylesheet"
     >
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -35,54 +28,37 @@
      NAVBAR
 ========================================================= -->
 
-<nav class="navbar">
+<header class="navbar">
 
-    <div
-        class="nav-logo"
-        onclick="showLanding()"
-    >
-        <span class="delta-mark">Δ</span>
-        <span>DELTA</span>
+    <div class="logo" onclick="goHome()">
+        DELTA
     </div>
 
-    <div class="nav-links">
-
-        <a
-            href="#home"
-            onclick="showLanding()"
-        >
-            Home
-        </a>
-
-        <a href="#about">
-            About
-        </a>
-
-        <a href="#ecosystem">
-            Ecosystem
-        </a>
-
-    </div>
+    <nav class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#ecosystem">Ecosystem</a>
+        <a href="#community">Community</a>
+    </nav>
 
     <div class="nav-actions">
 
         <button
-            class="nav-login"
-            onclick="openAuth('login')"
-        >
+            id="loginTop"
+            class="btn btn-outline"
+            onclick="openJoin()">
             Login
         </button>
 
         <button
-            class="nav-join"
-            onclick="openAuth('register')"
-        >
+            class="btn btn-primary"
+            onclick="openJoin()">
             Join Delta
         </button>
 
     </div>
 
-</nav>
+</header>
 
 
 <!-- =========================================================
@@ -91,18 +67,16 @@
 
 <main id="landingPage">
 
-    <!-- ================= HERO ================= -->
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
-    <section
-        id="home"
-        class="hero"
-    >
+    <section id="home" class="hero">
 
         <div class="hero-content">
 
-            <div class="hero-eyebrow">
-                <span></span>
-                THE ENTREPRENEURSHIP NETWORK
+            <div class="section-label">
+                THE ENTREPRENEURSHIP ECOSYSTEM
             </div>
 
             <h1>
@@ -112,250 +86,170 @@
             </h1>
 
             <p class="hero-description">
-                Delta connects ambitious founders,
-                investors and consultants to turn
-                ideas into meaningful businesses.
+                Delta is built for people who want to create,
+                invest in and shape the businesses of tomorrow.
             </p>
 
             <div class="hero-actions">
 
                 <button
-                    class="primary-btn"
-                    onclick="openAuth('register')"
-                >
-                    Join Delta
-                    <span>↗</span>
+                    class="btn btn-primary btn-large"
+                    onclick="openJoin()">
+                    Start Your Journey
                 </button>
 
                 <a
                     href="#ecosystem"
-                    class="secondary-btn"
-                >
-                    Explore Ecosystem
+                    class="btn btn-outline btn-large">
+                    Explore Delta
                 </a>
-
-            </div>
-
-            <div class="hero-meta">
-
-                <span>
-                    FOUNDERS
-                </span>
-
-                <span>
-                    INVESTORS
-                </span>
-
-                <span>
-                    CONSULTANTS
-                </span>
 
             </div>
 
         </div>
 
 
-        <!-- ================= DELTA VISUAL ================= -->
+        <!-- FLOATING DELTA VISUAL -->
 
         <div class="hero-visual">
 
-            <div class="orbit orbit-one"></div>
-            <div class="orbit orbit-two"></div>
-            <div class="orbit orbit-three"></div>
+            <div class="delta-glow"></div>
 
-            <div class="delta-core">
-                <span>Δ</span>
+            <div class="delta-symbol">
+                Δ
             </div>
+
+            <div class="hero-orbit orbit-one"></div>
+            <div class="hero-orbit orbit-two"></div>
+            <div class="hero-orbit orbit-three"></div>
 
             <div class="orbit-dot dot-one"></div>
             <div class="orbit-dot dot-two"></div>
             <div class="orbit-dot dot-three"></div>
 
-
-            <!-- Floating network activity -->
-
+            <!-- Floating community activity -->
             <div
                 id="floatingPosts"
-                class="floating-posts"
-            ></div>
+                class="floating-posts">
+            </div>
 
         </div>
 
     </section>
 
 
-    <!-- ================= NETWORK TICKER ================= -->
+    <!-- =====================================================
+         COMMUNITY
+    ====================================================== -->
 
-    <div class="network-ticker">
+    <section
+        id="community"
+        class="section community-preview">
 
-        <div class="ticker-track">
+        <div class="section-label">
+            DELTA COMMUNITY
+        </div>
 
-            <span>FOUNDERS</span>
-            <i>✦</i>
+        <h2>
+            Ideas are better
+            <span>when connected.</span>
+        </h2>
 
-            <span>INVESTORS</span>
-            <i>✦</i>
+        <p class="section-description">
+            Founders, investors and consultants sharing ideas,
+            insights and opportunities inside Delta.
+        </p>
 
-            <span>CONSULTANTS</span>
-            <i>✦</i>
+        <div
+            id="homeFeed"
+            class="home-feed-grid">
 
-            <span>IDEAS</span>
-            <i>✦</i>
-
-            <span>CAPITAL</span>
-            <i>✦</i>
-
-            <span>EXPERTISE</span>
-            <i>✦</i>
-
-            <span>FOUNDERS</span>
-            <i>✦</i>
-
-            <span>INVESTORS</span>
-            <i>✦</i>
+            <div class="loading-state">
+                Loading Delta activity...
+            </div>
 
         </div>
 
-    </div>
+    </section>
 
 
     <!-- =====================================================
          ABOUT
     ====================================================== -->
 
-    <section
-        id="about"
-        class="section about-section"
-    >
+    <section id="about" class="section">
 
-        <div class="section-heading">
-
-            <div>
-
-                <span class="eyebrow">
-                    WHY DELTA
-                </span>
-
-                <h2>
-                    Entrepreneurship,
-                    <br>
-                    without borders.
-                </h2>
-
-            </div>
-
-            <p>
-                A connected ecosystem designed to
-                help entrepreneurs find the people,
-                knowledge and opportunities they need
-                to move forward.
-            </p>
-
+        <div class="section-label">
+            WHY DELTA
         </div>
 
+        <h2>
+            Entrepreneurship,
+            <span>without borders.</span>
+        </h2>
 
-        <div class="role-grid">
+        <p class="section-description">
+            From the first idea to a scalable company,
+            Delta brings the people, knowledge and resources
+            founders need into one ecosystem.
+        </p>
 
-            <!-- Founder -->
 
-            <article class="role-card">
+        <div class="feature-grid">
 
-                <div class="card-number">
+            <div class="feature-card">
+
+                <div class="feature-number">
                     01
                 </div>
 
-                <div class="role-icon">
-                    ◇
-                </div>
-
                 <h3>
-                    Founders
+                    For Founders
                 </h3>
 
                 <p>
-                    Build your profile, showcase your
-                    startup, publish your ideas and
-                    connect with people who can help
-                    you scale.
+                    Validate ideas, build your profile,
+                    create pitches and connect with the
+                    right people.
                 </p>
 
-                <button
-                    class="text-link"
-                    onclick="openAuth('register','Founder')"
-                >
-                    Join as Founder
-                    <span>→</span>
-                </button>
-
-            </article>
+            </div>
 
 
-            <!-- Investor -->
+            <div class="feature-card">
 
-            <article class="role-card">
-
-                <div class="card-number">
+                <div class="feature-number">
                     02
                 </div>
 
-                <div class="role-icon">
-                    ◈
-                </div>
-
                 <h3>
-                    Investors
+                    For Investors
                 </h3>
 
                 <p>
-                    Discover promising founders,
-                    explore opportunities and connect
-                    with the next generation of
-                    businesses.
+                    Discover promising founders and
+                    explore opportunities across industries.
                 </p>
 
-                <button
-                    class="text-link"
-                    onclick="openAuth('register','Investor')"
-                >
-                    Join as Investor
-                    <span>→</span>
-                </button>
-
-            </article>
+            </div>
 
 
-            <!-- Consultant -->
+            <div class="feature-card">
 
-            <article class="role-card">
-
-                <div class="card-number">
+                <div class="feature-number">
                     03
                 </div>
 
-                <div class="role-icon">
-                    ◉
-                </div>
-
                 <h3>
-                    Consultants
+                    For Consultants
                 </h3>
 
                 <p>
-                    Share your expertise, support
-                    ambitious founders and become
-                    part of a growing entrepreneurial
-                    ecosystem.
+                    Share your expertise and help ambitious
+                    founders solve real business problems.
                 </p>
 
-                <button
-                    class="text-link"
-                    onclick="openAuth('register','Consultant')"
-                >
-                    Join as Consultant
-                    <span>→</span>
-                </button>
-
-            </article>
+            </div>
 
         </div>
 
@@ -368,112 +262,86 @@
 
     <section
         id="ecosystem"
-        class="section ecosystem-section"
-    >
+        class="section ecosystem-section">
 
-        <div class="section-heading centered">
-
-            <span class="eyebrow">
-                THE DELTA ECOSYSTEM
-            </span>
-
-            <h2>
-                One network.
-                <span>Three forces.</span>
-            </h2>
-
-            <p>
-                Connect the right people at the right
-                stage of the journey.
-            </p>
-
+        <div class="section-label">
+            DELTA ECOSYSTEM
         </div>
 
+        <h2>
+            One ecosystem.
+            <span>Infinite possibilities.</span>
+        </h2>
 
         <div class="ecosystem-grid">
 
-            <div class="ecosystem-card">
+            <div class="eco-card">
 
-                <span class="ecosystem-index">
-                    F
-                </span>
-
-                <div>
-
-                    <h3>
-                        Founder
-                    </h3>
-
-                    <p>
-                        Turn your vision into a
-                        structured opportunity.
-                    </p>
-
+                <div class="eco-card-number">
+                    01
                 </div>
 
+                <h3>
+                    Founder
+                </h3>
+
+                <p>
+                    Turn your vision into a structured
+                    business opportunity.
+                </p>
+
                 <button
-                    onclick="openAuth('register','Founder')"
-                >
-                    Enter
-                    <span>↗</span>
+                    class="text-button"
+                    onclick="openJoin('Founder')">
+                    Join as Founder →
                 </button>
 
             </div>
 
 
-            <div class="ecosystem-card">
+            <div class="eco-card">
 
-                <span class="ecosystem-index">
-                    I
-                </span>
-
-                <div>
-
-                    <h3>
-                        Investor
-                    </h3>
-
-                    <p>
-                        Find founders and ideas
-                        worth backing.
-                    </p>
-
+                <div class="eco-card-number">
+                    02
                 </div>
 
+                <h3>
+                    Investor
+                </h3>
+
+                <p>
+                    Find ambitious founders and discover
+                    the next generation of companies.
+                </p>
+
                 <button
-                    onclick="openAuth('register','Investor')"
-                >
-                    Enter
-                    <span>↗</span>
+                    class="text-button"
+                    onclick="openJoin('Investor')">
+                    Join as Investor →
                 </button>
 
             </div>
 
 
-            <div class="ecosystem-card">
+            <div class="eco-card">
 
-                <span class="ecosystem-index">
-                    C
-                </span>
-
-                <div>
-
-                    <h3>
-                        Consultant
-                    </h3>
-
-                    <p>
-                        Put your expertise where
-                        it creates impact.
-                    </p>
-
+                <div class="eco-card-number">
+                    03
                 </div>
 
+                <h3>
+                    Consultant
+                </h3>
+
+                <p>
+                    Bring your expertise to founders
+                    building something meaningful.
+                </p>
+
                 <button
-                    onclick="openAuth('register','Consultant')"
-                >
-                    Enter
-                    <span>↗</span>
+                    class="text-button"
+                    onclick="openJoin('Consultant')">
+                    Join as Consultant →
                 </button>
 
             </div>
@@ -489,32 +357,25 @@
 
     <section class="cta-section">
 
-        <div class="cta-inner">
-
-            <span class="eyebrow">
-                YOUR NEXT MOVE
-            </span>
-
-            <h2>
-                Your idea deserves
-                <br>
-                the right network.
-            </h2>
-
-            <p>
-                Join Delta and start building
-                meaningful connections.
-            </p>
-
-            <button
-                class="primary-btn"
-                onclick="openAuth('register')"
-            >
-                Start Building
-                <span>↗</span>
-            </button>
-
+        <div class="section-label">
+            JOIN DELTA
         </div>
+
+        <h2>
+            Your idea deserves
+            <span>an ecosystem.</span>
+        </h2>
+
+        <p>
+            Build your profile. Meet the right people.
+            Create something that matters.
+        </p>
+
+        <button
+            class="btn btn-primary btn-large"
+            onclick="openJoin()">
+            Enter Delta
+        </button>
 
     </section>
 
@@ -526,258 +387,290 @@
 ========================================================= -->
 
 <div
-    id="authModal"
     class="modal"
-    style="display:none;"
->
+    id="authModal">
 
-    <div
-        class="modal-overlay"
-        onclick="closeAuth()"
-    ></div>
-
-    <div class="auth-modal">
+    <div class="modal-box">
 
         <button
             class="modal-close"
-            onclick="closeAuth()"
-        >
+            onclick="closeJoin()">
             ×
         </button>
 
 
-        <!-- AUTH CHOICE -->
+        <!-- ROLE CHOICE -->
 
-        <div
-            id="authChoice"
-            class="auth-view"
-        >
+        <div id="authChoice">
 
-            <span class="eyebrow">
-                WELCOME TO DELTA
-            </span>
+            <div class="section-label">
+                JOIN DELTA
+            </div>
 
             <h2>
-                Choose your path.
+                Become part of
+                <span>the ecosystem.</span>
             </h2>
 
             <p>
-                Join the ecosystem built for
-                ambitious people.
+                Choose your role to continue.
             </p>
 
-            <div class="role-choice-grid">
+
+            <div class="role-grid">
 
                 <button
-                    onclick="selectRole('Founder')"
-                >
-                    <span>01</span>
-                    <strong>Founder</strong>
-                    <small>Build & grow</small>
+                    type="button"
+                    class="role-card"
+                    onclick="chooseRole('Founder')">
+
+                    <strong>
+                        Founder
+                    </strong>
+
+                    <span>
+                        Build & scale
+                    </span>
+
                 </button>
 
-                <button
-                    onclick="selectRole('Investor')"
-                >
-                    <span>02</span>
-                    <strong>Investor</strong>
-                    <small>Discover & invest</small>
-                </button>
 
                 <button
-                    onclick="selectRole('Consultant')"
-                >
-                    <span>03</span>
-                    <strong>Consultant</strong>
-                    <small>Guide & advise</small>
+                    type="button"
+                    class="role-card"
+                    onclick="chooseRole('Investor')">
+
+                    <strong>
+                        Investor
+                    </strong>
+
+                    <span>
+                        Discover opportunities
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="role-card"
+                    onclick="chooseRole('Consultant')">
+
+                    <strong>
+                        Consultant
+                    </strong>
+
+                    <span>
+                        Share expertise
+                    </span>
+
                 </button>
 
             </div>
 
+
+            <div
+                id="selectedRole"
+                class="selected-role">
+            </div>
+
+
             <button
-                class="auth-switch"
-                onclick="showLoginForm()"
-            >
-                Already have an account?
-                <span>Login</span>
+                id="continueButton"
+                type="button"
+                class="btn btn-primary btn-large"
+                onclick="showRegisterForm()">
+                Continue
             </button>
+
+
+            <div class="auth-switch">
+
+                Already have an account?
+
+                <button
+                    type="button"
+                    onclick="showLoginForm()">
+                    Login
+                </button>
+
+            </div>
 
         </div>
 
 
         <!-- REGISTER -->
 
-        <div
+        <form
             id="registerForm"
-            class="auth-view"
-            style="display:none;"
-        >
+            class="hidden">
 
-            <span class="eyebrow">
+            <div class="section-label">
                 CREATE ACCOUNT
-            </span>
+            </div>
 
             <h2>
-                Enter Delta.
+                Welcome to
+                <span>Delta.</span>
             </h2>
 
-            <p id="selectedRoleText">
+            <p id="roleText">
                 Create your account.
             </p>
 
-            <form id="registerFormElement">
 
-                <div class="input-group">
+            <div class="form-group">
 
-                    <label>
-                        Full Name
-                    </label>
+                <label for="name">
+                    Full Name
+                </label>
 
-                    <input
-                        type="text"
-                        id="registerName"
-                        required
-                        minlength="2"
-                        placeholder="Your name"
-                    >
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Your name"
+                    required>
 
-                </div>
+            </div>
 
 
-                <div class="input-group">
+            <div class="form-group">
 
-                    <label>
-                        Email
-                    </label>
+                <label for="email">
+                    Email
+                </label>
 
-                    <input
-                        type="email"
-                        id="registerEmail"
-                        required
-                        placeholder="you@example.com"
-                    >
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="you@example.com"
+                    required>
 
-                </div>
-
-
-                <div class="input-group">
-
-                    <label>
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        id="registerPassword"
-                        required
-                        minlength="6"
-                        placeholder="Minimum 6 characters"
-                    >
-
-                </div>
+            </div>
 
 
-                <button
-                    type="submit"
-                    class="primary-btn full-btn"
-                >
-                    Create Account
-                    <span>↗</span>
-                </button>
+            <div class="form-group">
 
-                <p
-                    id="registerMessage"
-                    class="form-message"
-                ></p>
+                <label for="password">
+                    Password
+                </label>
 
-            </form>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Create a password"
+                    minlength="6"
+                    required>
+
+            </div>
+
 
             <button
-                class="auth-switch"
-                onclick="showAuthChoice()"
-            >
-                ← Change role
+                type="submit"
+                class="btn btn-primary btn-large">
+                Create Account
             </button>
 
-        </div>
+
+            <div
+                id="registerMessage"
+                class="form-message">
+            </div>
+
+
+            <div class="auth-switch">
+
+                Already have an account?
+
+                <button
+                    type="button"
+                    onclick="showLoginForm()">
+                    Login
+                </button>
+
+            </div>
+
+        </form>
 
 
         <!-- LOGIN -->
 
         <div
-            id="loginForm"
-            class="auth-view"
-            style="display:none;"
-        >
+            id="loginFormWrap"
+            class="hidden">
 
-            <span class="eyebrow">
+            <div class="section-label">
                 WELCOME BACK
-            </span>
+            </div>
 
             <h2>
-                Continue building.
+                Login to
+                <span>Delta.</span>
             </h2>
 
             <p>
-                Sign in to your Delta account.
+                Continue building your journey.
             </p>
 
-            <form id="loginFormElement">
 
-                <div class="input-group">
+            <form id="loginForm">
 
-                    <label>
+                <div class="form-group">
+
+                    <label for="loginEmail">
                         Email
                     </label>
 
                     <input
                         type="email"
                         id="loginEmail"
-                        required
                         placeholder="you@example.com"
-                    >
+                        required>
 
                 </div>
 
 
-                <div class="input-group">
+                <div class="form-group">
 
-                    <label>
+                    <label for="loginPassword">
                         Password
                     </label>
 
                     <input
                         type="password"
                         id="loginPassword"
-                        required
                         placeholder="Your password"
-                    >
+                        required>
 
                 </div>
 
 
                 <button
                     type="submit"
-                    class="primary-btn full-btn"
-                >
+                    class="btn btn-primary btn-large">
                     Login
-                    <span>↗</span>
                 </button>
 
-                <p
+
+                <div
                     id="loginMessage"
-                    class="form-message"
-                ></p>
+                    class="form-message">
+                </div>
 
             </form>
 
-            <button
-                class="auth-switch"
-                onclick="showAuthChoice()"
-            >
+
+            <div class="auth-switch">
+
                 Don't have an account?
-                <span>Join Delta</span>
-            </button>
+
+                <button
+                    type="button"
+                    onclick="showRegisterChoice()">
+                    Create account
+                </button>
+
+            </div>
 
         </div>
 
@@ -790,47 +683,42 @@
      DASHBOARD
 ========================================================= -->
 
-<div
+<main
     id="dashboardPage"
-    class="dashboard-page"
-    style="display:none;"
->
+    class="dashboard hidden">
 
 
-    <!-- ================= SIDEBAR ================= -->
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
     <aside class="dashboard-sidebar">
 
-        <div class="dashboard-brand">
-
-            <span class="delta-mark">
-                Δ
-            </span>
-
-            <span>
-                DELTA
-            </span>
-
+        <div
+            class="dashboard-logo"
+            onclick="goHome()">
+            DELTA
         </div>
 
 
-        <div class="dashboard-user">
+        <!-- USER MINI PROFILE -->
+
+        <div class="user-mini">
 
             <div
                 id="dashboardAvatar"
-                class="dashboard-avatar"
-            >
-                D
+                class="user-mini-avatar">
+                Δ
             </div>
 
             <div>
 
-                <strong id="dashboardName">
-                    Founder
+                <strong id="dashboardGreeting">
+                    Welcome
                 </strong>
 
-                <span id="dashboardRole">
-                    Founder
+                <span id="userBadge">
+                    Member
                 </span>
 
             </div>
@@ -838,185 +726,201 @@
         </div>
 
 
+        <!-- NAVIGATION -->
+
         <nav class="dashboard-nav">
 
             <button
-                class="dashboard-nav-item active"
-                data-section="overview"
-                onclick="showDashboardSection('overview')"
-            >
-                <span class="nav-symbol">◈</span>
+                type="button"
+                class="side-link active"
+                data-section="dashboard"
+                onclick="showDashboardSection('dashboard')">
+
+                <span>⌂</span>
                 Overview
+
             </button>
 
 
             <button
-                class="dashboard-nav-item"
+                type="button"
+                class="side-link"
                 data-section="profile"
-                onclick="showDashboardSection('profile')"
-            >
-                <span class="nav-symbol">◇</span>
+                onclick="showDashboardSection('profile')">
+
+                <span>◯</span>
                 My Profile
+
             </button>
 
 
             <button
-                id="createPitchNav"
-                class="dashboard-nav-item"
-                data-section="createPitch"
-                onclick="showDashboardSection('createPitch')"
-            >
-                <span class="nav-symbol">+</span>
-                Create Pitch
-            </button>
+                type="button"
+                class="side-link"
+                data-section="post"
+                onclick="showDashboardSection('post')">
 
-
-            <button
-                id="myPitchesNav"
-                class="dashboard-nav-item"
-                data-section="myPitches"
-                onclick="showDashboardSection('myPitches')"
-            >
-                <span class="nav-symbol">▱</span>
-                My Pitches
-            </button>
-
-
-            <button
-                class="dashboard-nav-item"
-                data-section="createPost"
-                onclick="showDashboardSection('createPost')"
-            >
-                <span class="nav-symbol">✦</span>
+                <span>✦</span>
                 Create Post
+
             </button>
 
 
             <button
-                class="dashboard-nav-item"
-                data-section="myPosts"
-                onclick="showDashboardSection('myPosts')"
-            >
-                <span class="nav-symbol">□</span>
+                type="button"
+                class="side-link"
+                data-section="posts"
+                onclick="showDashboardSection('posts')">
+
+                <span>◉</span>
                 My Posts
+
             </button>
 
 
             <button
-                class="dashboard-nav-item"
+                type="button"
+                class="side-link"
+                data-section="pitch"
+                onclick="showDashboardSection('pitch')">
+
+                <span>＋</span>
+                Create Pitch
+
+            </button>
+
+
+            <button
+                type="button"
+                class="side-link"
+                data-section="pitches"
+                onclick="showDashboardSection('pitches')">
+
+                <span>▣</span>
+                My Pitches
+
+            </button>
+
+
+            <button
+                type="button"
+                class="side-link"
                 data-section="discover"
-                onclick="showDashboardSection('discover')"
-            >
-                <span class="nav-symbol">◎</span>
+                onclick="showDashboardSection('discover')">
+
+                <span>⌕</span>
                 Discover
+
             </button>
 
 
             <button
-                class="dashboard-nav-item"
+                type="button"
+                class="side-link"
                 data-section="connections"
-                onclick="showDashboardSection('connections')"
-            >
-                <span class="nav-symbol">∞</span>
+                onclick="showDashboardSection('connections')">
+
+                <span>↔</span>
                 Connections
+
             </button>
 
 
-            <!-- NEW -->
+            <!-- MESSAGES -->
 
             <button
-                class="dashboard-nav-item"
+                type="button"
+                class="side-link"
                 data-section="messages"
-                onclick="showDashboardSection('messages')"
-            >
-                <span class="nav-symbol">◇</span>
+                onclick="showDashboardSection('messages')">
+
+                <span>◇</span>
                 Messages
+
                 <span
                     id="messageBadge"
-                    class="message-badge"
-                    style="display:none;"
-                >
+                    class="notification-badge hidden">
                     0
                 </span>
+
             </button>
 
         </nav>
 
 
+        <!-- LOGOUT -->
+
         <button
-            class="dashboard-logout"
-            onclick="logout()"
-        >
-            <span>↪</span>
+            id="logoutButton"
+            type="button"
+            class="logout-button">
             Logout
         </button>
 
     </aside>
 
 
-    <!-- ================= DASHBOARD CONTENT ================= -->
+    <!-- =====================================================
+         DASHBOARD CONTENT
+    ====================================================== -->
 
-    <main class="dashboard-content">
+    <section class="dashboard-content">
 
 
-        <!-- ================================================
+        <!-- =================================================
              OVERVIEW
-        ================================================= -->
+        ================================================== -->
 
         <section
-            id="overviewSection"
-            class="dashboard-section"
-        >
+            id="section-dashboard"
+            class="dash-section">
 
-            <div class="dashboard-top">
+            <div class="dashboard-header">
 
                 <div>
 
-                    <span class="eyebrow">
-                        DELTA NETWORK
-                    </span>
+                    <div class="section-label">
+                        DELTA DASHBOARD
+                    </div>
 
                     <h1>
-                        Welcome back,
-                        <span id="overviewName">
-                            Founder
-                        </span>.
+                        Welcome to
+                        <span>Delta.</span>
                     </h1>
 
                     <p>
-                        Your entrepreneurial journey
-                        starts with meaningful connections.
+                        Your entrepreneurship journey starts here.
                     </p>
 
                 </div>
 
+
+                <div
+                    id="overviewAvatar"
+                    class="dashboard-profile-orb">
+                    Δ
+                </div>
+
             </div>
 
+
+            <!-- STATS -->
 
             <div class="stats-grid">
 
                 <div class="stat-card">
 
                     <span>
-                        CONNECTIONS
+                        PROFILE
                     </span>
 
-                    <strong id="connectionCount">
-                        0
+                    <strong id="profileStatus">
+                        Incomplete
                     </strong>
 
-                </div>
-
-
-                <div class="stat-card">
-
-                    <span>
-                        PITCHES
-                    </span>
-
-                    <strong id="pitchCount">
-                        0
-                    </strong>
+                    <small>
+                        Complete your profile
+                    </small>
 
                 </div>
 
@@ -1031,48 +935,135 @@
                         0
                     </strong>
 
+                    <small>
+                        Your community posts
+                    </small>
+
                 </div>
 
 
                 <div class="stat-card">
 
                     <span>
-                        NETWORK
+                        PITCHES
                     </span>
 
-                    <strong>
-                        ∞
+                    <strong id="pitchCount">
+                        0
                     </strong>
+
+                    <small>
+                        Your startup pitches
+                    </small>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>
+                        CONNECTIONS
+                    </span>
+
+                    <strong id="connectionCount">
+                        0
+                    </strong>
+
+                    <small>
+                        People in your network
+                    </small>
 
                 </div>
 
             </div>
 
 
-            <!-- Recent Activity -->
+            <!-- PROFILE CTA -->
 
-            <div class="dashboard-panel">
+            <div class="dashboard-welcome-card">
 
-                <div class="panel-heading">
+                <div>
+
+                    <div class="section-label">
+                        NEXT STEP
+                    </div>
+
+                    <h2>
+                        Build your
+                        <span>Delta profile.</span>
+                    </h2>
+
+                    <p>
+                        Tell the ecosystem who you are,
+                        what you're building and what you need.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="showDashboardSection('profile')">
+                    Complete Profile
+                </button>
+
+            </div>
+
+
+            <!-- COMMUNITY CTA -->
+
+            <div class="dashboard-welcome-card community-card">
+
+                <div>
+
+                    <div class="section-label">
+                        COMMUNITY
+                    </div>
+
+                    <h2>
+                        Share what you're
+                        <span>building.</span>
+                    </h2>
+
+                    <p>
+                        Publish updates, insights and opportunities
+                        for the Delta ecosystem.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    onclick="showDashboardSection('post')">
+                    Create Post
+                </button>
+
+            </div>
+
+
+            <!-- OVERVIEW COMMUNITY -->
+
+            <div class="dashboard-community-preview">
+
+                <div class="dashboard-subheading">
 
                     <div>
-
-                        <span class="eyebrow">
-                            NETWORK ACTIVITY
-                        </span>
+                        <div class="section-label">
+                            COMMUNITY ACTIVITY
+                        </div>
 
                         <h2>
-                            Latest from Delta
+                            What's happening
+                            <span>inside Delta.</span>
                         </h2>
-
                     </div>
 
                     <button
-                        class="text-link"
-                        onclick="showDashboardSection('discover')"
-                    >
-                        Explore
-                        <span>→</span>
+                        type="button"
+                        class="text-button"
+                        onclick="showDashboardSection('posts')">
+                        View activity →
                     </button>
 
                 </div>
@@ -1080,11 +1071,10 @@
 
                 <div
                     id="overviewPosts"
-                    class="posts-grid"
-                >
+                    class="posts-grid">
 
-                    <div class="empty-state">
-                        Loading Delta activity...
+                    <div class="loading-state">
+                        Loading community...
                     </div>
 
                 </div>
@@ -1094,57 +1084,425 @@
         </section>
 
 
-        <!-- ================================================
+        <!-- =================================================
              PROFILE
-        ================================================= -->
+        ================================================== -->
 
         <section
-            id="profileSection"
-            class="dashboard-section"
-            style="display:none;"
-        >
+            id="section-profile"
+            class="dash-section hidden">
 
-            <div class="section-heading">
+            <div class="profile-heading">
 
                 <div>
 
-                    <span class="eyebrow">
-                        YOUR IDENTITY
-                    </span>
+                    <div class="section-label">
+                        MY PROFILE
+                    </div>
 
-                    <h2>
-                        My Profile
-                    </h2>
+                    <h1>
+                        Build your
+                        <span>profile.</span>
+                    </h1>
 
-                    <p>
-                        Build a profile that represents
-                        your journey inside Delta.
+                    <p class="section-description">
+                        Give founders, investors and consultants
+                        a clear picture of who you are.
                     </p>
 
+                </div>
+
+
+                <div
+                    id="profileAvatar"
+                    class="profile-avatar-large">
+                    Δ
                 </div>
 
             </div>
 
 
-            <div class="profile-editor">
+            <div
+                id="profileRoleHint"
+                class="role-hint">
+            </div>
 
-                <div class="profile-editor-top">
+
+            <form
+                id="profileForm"
+                class="dashboard-form">
+
+
+                <!-- PROFILE IMAGE -->
+
+                <div class="profile-image-section">
 
                     <div
-                        id="profileAvatar"
-                        class="large-profile-avatar"
-                    >
-                        D
+                        id="profileImagePreview"
+                        class="profile-image-preview">
+                        Δ
                     </div>
 
                     <div>
 
-                        <h3 id="profileDisplayName">
-                            Founder
+                        <h3>
+                            Profile Image
                         </h3>
 
-                        <span id="profileDisplayRole">
-                            Founder
+                        <p>
+                            Add a public image URL for your
+                            Delta profile.
+                        </p>
+
+                        <input
+                            type="url"
+                            id="profileImage"
+                            placeholder="https://example.com/profile.jpg">
+
+                        <small class="input-help">
+                            Image upload storage can be connected
+                            later without changing the profile UI.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FORM -->
+
+                <div class="form-grid">
+
+
+                    <!-- COMMON -->
+
+                    <div class="form-group">
+
+                        <label for="profileName">
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="profileName"
+                            placeholder="Your name">
+
+                    </div>
+
+
+                    <!-- FOUNDER -->
+
+                    <div
+                        id="founderStartupGroup"
+                        class="form-group role-field">
+
+                        <label for="startupName">
+                            Startup / Company
+                        </label>
+
+                        <input
+                            type="text"
+                            id="startupName"
+                            placeholder="Company name">
+
+                    </div>
+
+
+                    <div
+                        id="founderIdeaGroup"
+                        class="form-group role-field">
+
+                        <label for="idea">
+                            Idea
+                        </label>
+
+                        <input
+                            type="text"
+                            id="idea"
+                            placeholder="What are you building?">
+
+                    </div>
+
+
+                    <div
+                        id="industryGroup"
+                        class="form-group role-field">
+
+                        <label for="industry">
+                            Industry
+                        </label>
+
+                        <input
+                            type="text"
+                            id="industry"
+                            placeholder="Technology, Finance, Health...">
+
+                    </div>
+
+
+                    <div
+                        id="stageGroup"
+                        class="form-group role-field">
+
+                        <label for="stage">
+                            Stage
+                        </label>
+
+                        <select id="stage">
+
+                            <option value="">
+                                Select stage
+                            </option>
+
+                            <option value="idea">
+                                Idea
+                            </option>
+
+                            <option value="pre-seed">
+                                Pre-Seed
+                            </option>
+
+                            <option value="seed">
+                                Seed
+                            </option>
+
+                            <option value="growth">
+                                Growth
+                            </option>
+
+                            <option value="scale">
+                                Scale
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- INVESTOR -->
+
+                    <div
+                        id="investorFirmGroup"
+                        class="form-group role-field">
+
+                        <label for="firmName">
+                            Firm / Organization
+                        </label>
+
+                        <input
+                            type="text"
+                            id="firmName"
+                            placeholder="Firm name">
+
+                    </div>
+
+
+                    <div
+                        id="investorFocusGroup"
+                        class="form-group role-field">
+
+                        <label for="investmentFocus">
+                            Investment Focus
+                        </label>
+
+                        <input
+                            type="text"
+                            id="investmentFocus"
+                            placeholder="Early-stage, SaaS, DeepTech...">
+
+                    </div>
+
+
+                    <div
+                        id="investorIndustriesGroup"
+                        class="form-group role-field">
+
+                        <label for="industries">
+                            Industries
+                        </label>
+
+                        <input
+                            type="text"
+                            id="industries"
+                            placeholder="Comma separated">
+
+                    </div>
+
+
+                    <div
+                        id="investorTicketGroup"
+                        class="form-group role-field">
+
+                        <label for="ticketSize">
+                            Ticket Size
+                        </label>
+
+                        <input
+                            type="text"
+                            id="ticketSize"
+                            placeholder="₹10L — ₹1Cr">
+
+                    </div>
+
+
+                    <!-- CONSULTANT -->
+
+                    <div
+                        id="consultantExpertiseGroup"
+                        class="form-group role-field">
+
+                        <label for="expertise">
+                            Expertise
+                        </label>
+
+                        <input
+                            type="text"
+                            id="expertise"
+                            placeholder="Marketing, Finance, Product...">
+
+                    </div>
+
+
+                    <div
+                        id="consultantExperienceGroup"
+                        class="form-group role-field">
+
+                        <label for="experience">
+                            Experience
+                        </label>
+
+                        <input
+                            type="text"
+                            id="experience"
+                            placeholder="5 years">
+
+                    </div>
+
+
+                    <div
+                        id="consultantRateGroup"
+                        class="form-group role-field">
+
+                        <label for="hourlyRate">
+                            Hourly Rate
+                        </label>
+
+                        <input
+                            type="text"
+                            id="hourlyRate"
+                            placeholder="₹ / hour">
+
+                    </div>
+
+
+                    <!-- COMMON -->
+
+                    <div class="form-group">
+
+                        <label for="location">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="location"
+                            placeholder="City, Country">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="website">
+                            Website
+                        </label>
+
+                        <input
+                            type="url"
+                            id="website"
+                            placeholder="https://">
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="bio">
+                        About You
+                    </label>
+
+                    <textarea
+                        id="bio"
+                        rows="6"
+                        maxlength="2000"
+                        placeholder="Tell the Delta ecosystem about yourself..."></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+                    Save Profile
+                </button>
+
+
+                <div
+                    id="profileMessage"
+                    class="form-message">
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- =================================================
+             CREATE POST
+        ================================================== -->
+
+        <section
+            id="section-post"
+            class="dash-section hidden">
+
+            <div class="section-label">
+                COMMUNITY
+            </div>
+
+            <h1>
+                Share your
+                <span>thoughts.</span>
+            </h1>
+
+            <p class="section-description">
+                Share an update, insight, opportunity or
+                something you're building with Delta.
+            </p>
+
+
+            <form
+                id="postForm"
+                class="dashboard-form post-composer">
+
+
+                <div class="post-composer-header">
+
+                    <div
+                        id="postComposerAvatar"
+                        class="composer-avatar">
+                        Δ
+                    </div>
+
+                    <div>
+
+                        <strong id="composerName">
+                            Delta Member
+                        </strong>
+
+                        <span id="composerRole">
+                            Member
                         </span>
 
                     </div>
@@ -1152,426 +1510,112 @@
                 </div>
 
 
-                <form id="profileForm">
+                <div class="form-group">
 
-                    <!-- Dynamic role-specific fields
-                         will be inserted here by app.js -->
+                    <label for="postContent">
+                        What's happening?
+                    </label>
 
-                    <div
-                        id="profileRoleFields"
-                        class="profile-role-fields"
-                    ></div>
+                    <textarea
+                        id="postContent"
+                        rows="8"
+                        maxlength="5000"
+                        placeholder="Share what you're building, learning or looking for..."
+                        required></textarea>
 
-
-                    <button
-                        type="submit"
-                        class="primary-btn"
-                    >
-                        Save Profile
-                        <span>↗</span>
-                    </button>
-
-                    <p
-                        id="profileMessage"
-                        class="form-message"
-                    ></p>
-
-                </form>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================================================
-             CREATE PITCH
-        ================================================= -->
-
-        <section
-            id="createPitchSection"
-            class="dashboard-section"
-            style="display:none;"
-        >
-
-            <div class="section-heading">
-
-                <div>
-
-                    <span class="eyebrow">
-                        FOUNDER SPACE
-                    </span>
-
-                    <h2>
-                        Create Pitch
-                    </h2>
-
-                    <p>
-                        Turn your startup into an
-                        opportunity others can understand.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-form-card">
-
-                <form id="pitchForm">
-
-                    <div class="form-grid">
-
-                        <div class="input-group">
-
-                            <label>
-                                Pitch Title
-                            </label>
-
-                            <input
-                                type="text"
-                                id="pitchTitle"
-                                required
-                                maxlength="150"
-                                placeholder="What are you building?"
-                            >
-
-                        </div>
-
-
-                        <div class="input-group">
-
-                            <label>
-                                Industry
-                            </label>
-
-                            <input
-                                type="text"
-                                id="pitchIndustry"
-                                placeholder="Technology, Fintech..."
-                            >
-
-                        </div>
-
-
-                        <div class="input-group">
-
-                            <label>
-                                Stage
-                            </label>
-
-                            <input
-                                type="text"
-                                id="pitchStage"
-                                placeholder="Idea, MVP, Growth..."
-                            >
-
-                        </div>
-
-
-                        <div class="input-group">
-
-                            <label>
-                                Funding Required
-                            </label>
-
-                            <input
-                                type="text"
-                                id="fundingRequired"
-                                placeholder="₹10L, $100K..."
-                            >
-
-                        </div>
-
-
-                        <div class="input-group full-width">
-
-                            <label>
-                                Website
-                            </label>
-
-                            <input
-                                type="url"
-                                id="pitchWebsite"
-                                placeholder="https://..."
-                            >
-
-                        </div>
-
-
-                        <div class="input-group full-width">
-
-                            <label>
-                                Description
-                            </label>
-
-                            <textarea
-                                id="pitchDescription"
-                                required
-                                maxlength="5000"
-                                rows="7"
-                                placeholder="Explain your startup, problem, solution and opportunity..."
-                            ></textarea>
-
-                        </div>
-
-
-                        <div class="input-group">
-
-                            <label>
-                                Status
-                            </label>
-
-                            <select id="pitchStatus">
-
-                                <option value="Draft">
-                                    Draft
-                                </option>
-
-                                <option value="Published">
-                                    Published
-                                </option>
-
-                                <option value="Closed">
-                                    Closed
-                                </option>
-
-                            </select>
-
-                        </div>
-
+                    <div class="character-count">
+                        <span id="postCharacterCount">0</span>/5000
                     </div>
 
-
-                    <button
-                        type="submit"
-                        class="primary-btn"
-                    >
-                        Publish Pitch
-                        <span>↗</span>
-                    </button>
-
-                    <p
-                        id="pitchMessage"
-                        class="form-message"
-                    ></p>
-
-                </form>
-
-            </div>
-
-        </section>
+                </div>
 
 
-        <!-- ================================================
-             MY PITCHES
-        ================================================= -->
+                <div class="form-group">
 
-        <section
-            id="myPitchesSection"
-            class="dashboard-section"
-            style="display:none;"
-        >
+                    <label for="postImageUrl">
+                        Image URL
+                        <span class="optional-label">
+                            Optional
+                        </span>
+                    </label>
 
-            <div class="section-heading">
+                    <input
+                        type="url"
+                        id="postImageUrl"
+                        placeholder="https://example.com/image.jpg">
 
-                <div>
-
-                    <span class="eyebrow">
-                        YOUR WORK
-                    </span>
-
-                    <h2>
-                        My Pitches
-                    </h2>
-
-                    <p>
-                        Manage your startup opportunities.
-                    </p>
+                    <small class="input-help">
+                        Add a public image URL. Direct image uploads
+                        can be added in a later storage layer.
+                    </small>
 
                 </div>
 
-            </div>
-
-
-            <div
-                id="myPitches"
-                class="pitch-grid"
-            >
-
-                <div class="empty-state">
-                    Loading pitches...
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================================================
-             CREATE POST
-        ================================================= -->
-
-        <section
-            id="createPostSection"
-            class="dashboard-section"
-            style="display:none;"
-        >
-
-            <div class="section-heading">
-
-                <div>
-
-                    <span class="eyebrow">
-                        DELTA NETWORK
-                    </span>
-
-                    <h2>
-                        Create Post
-                    </h2>
-
-                    <p>
-                        Share an idea, milestone,
-                        insight or update with your network.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-form-card post-composer">
-
-                <form id="postForm">
-
-                    <div class="composer-user">
-
-                        <div
-                            id="postComposerAvatar"
-                            class="dashboard-avatar"
-                        >
-                            D
-                        </div>
-
-                        <div>
-
-                            <strong id="postComposerName">
-                                Founder
-                            </strong>
-
-                            <span id="postComposerRole">
-                                Founder
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="input-group">
-
-                        <label>
-                            What's happening?
-                        </label>
-
-                        <textarea
-                            id="postContent"
-                            required
-                            maxlength="5000"
-                            rows="8"
-                            placeholder="Share something valuable with the Delta network..."
-                        ></textarea>
-
-                    </div>
-
-
-                    <div class="input-group">
-
-                        <label>
-                            Image URL
-                        </label>
-
-                        <input
-                            type="url"
-                            id="postImageUrl"
-                            placeholder="https://..."
-                        >
-
-                        <small class="input-hint">
-                            Image upload storage will be connected
-                            separately. For now, you can use an image URL.
-                        </small>
-
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="primary-btn"
-                    >
-                        Publish Post
-                        <span>↗</span>
-                    </button>
-
-
-                    <p
-                        id="postMessage"
-                        class="form-message"
-                    ></p>
-
-                </form>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================================================
-             MY POSTS
-        ================================================= -->
-
-        <section
-            id="myPostsSection"
-            class="dashboard-section"
-            style="display:none;"
-        >
-
-            <div class="section-heading">
-
-                <div>
-
-                    <span class="eyebrow">
-                        YOUR ACTIVITY
-                    </span>
-
-                    <h2>
-                        My Posts
-                    </h2>
-
-                    <p>
-                        Everything you've shared
-                        with the Delta network.
-                    </p>
-
-                </div>
 
                 <button
-                    class="primary-btn"
-                    onclick="showDashboardSection('createPost')"
-                >
-                    Create Post
-                    <span>+</span>
+                    type="submit"
+                    class="btn btn-primary">
+                    Publish Post
                 </button>
 
+
+                <div
+                    id="postMessage"
+                    class="form-message">
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- =================================================
+             MY POSTS
+        ================================================== -->
+
+        <section
+            id="section-posts"
+            class="dash-section hidden">
+
+            <div class="section-label">
+                MY POSTS
             </div>
+
+            <h1>
+                Your
+                <span>activity.</span>
+            </h1>
+
+            <p class="section-description">
+                Everything you've shared with the Delta community.
+            </p>
 
 
             <div
                 id="myPosts"
-                class="posts-grid"
-            >
+                class="posts-list">
 
                 <div class="empty-state">
-                    Loading your posts...
+
+                    <div class="empty-icon">
+                        Δ
+                    </div>
+
+                    <h3>
+                        No posts yet
+                    </h3>
+
+                    <p>
+                        Share your first update with the Delta ecosystem.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="showDashboardSection('post')">
+                        Create Post
+                    </button>
+
                 </div>
 
             </div>
@@ -1579,78 +1623,311 @@
         </section>
 
 
-        <!-- ================================================
-             DISCOVER
-        ================================================= -->
+        <!-- =================================================
+             CREATE PITCH
+        ================================================== -->
 
         <section
-            id="discoverSection"
-            class="dashboard-section"
-            style="display:none;"
-        >
+            id="section-pitch"
+            class="dash-section hidden">
 
-            <div class="section-heading">
+            <div class="section-label">
+                STARTUP PITCH
+            </div>
 
-                <div>
+            <h1>
+                Create your
+                <span>pitch.</span>
+            </h1>
 
-                    <span class="eyebrow">
-                        EXPAND YOUR NETWORK
-                    </span>
+            <p class="section-description">
+                Present your startup to the Delta ecosystem.
+            </p>
 
-                    <h2>
-                        Discover
-                    </h2>
+
+            <form
+                id="pitchForm"
+                class="dashboard-form">
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label for="pitchTitle">
+                            Pitch Title
+                        </label>
+
+                        <input
+                            type="text"
+                            id="pitchTitle"
+                            placeholder="Your startup name"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="pitchIndustry">
+                            Industry
+                        </label>
+
+                        <input
+                            type="text"
+                            id="pitchIndustry"
+                            placeholder="Industry"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="pitchStage">
+                            Stage
+                        </label>
+
+                        <select id="pitchStage">
+
+                            <option value="">
+                                Select stage
+                            </option>
+
+                            <option value="idea">
+                                Idea
+                            </option>
+
+                            <option value="pre-seed">
+                                Pre-Seed
+                            </option>
+
+                            <option value="seed">
+                                Seed
+                            </option>
+
+                            <option value="growth">
+                                Growth
+                            </option>
+
+                            <option value="scale">
+                                Scale
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="fundingRequired">
+                            Funding Required
+                        </label>
+
+                        <input
+                            type="text"
+                            id="fundingRequired"
+                            placeholder="Amount">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="pitchWebsite">
+                            Website
+                        </label>
+
+                        <input
+                            type="url"
+                            id="pitchWebsite"
+                            placeholder="https://">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="pitchStatus">
+                            Status
+                        </label>
+
+                        <select id="pitchStatus">
+
+                            <option value="Draft">
+                                Draft
+                            </option>
+
+                            <option value="Published">
+                                Published
+                            </option>
+
+                            <option value="Closed">
+                                Closed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="pitchDescription">
+                        Pitch Description
+                    </label>
+
+                    <textarea
+                        id="pitchDescription"
+                        rows="8"
+                        maxlength="5000"
+                        placeholder="What problem are you solving? What is your solution? Why now?"
+                        required></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+                    Save Pitch
+                </button>
+
+
+                <div
+                    id="pitchMessage"
+                    class="form-message">
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- =================================================
+             MY PITCHES
+        ================================================== -->
+
+        <section
+            id="section-pitches"
+            class="dash-section hidden">
+
+            <div class="section-label">
+                MY PITCHES
+            </div>
+
+            <h1>
+                Your
+                <span>pitches.</span>
+            </h1>
+
+            <p class="section-description">
+                Manage the startup opportunities you have created.
+            </p>
+
+
+            <div
+                id="myPitches"
+                class="content-list">
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        Δ
+                    </div>
+
+                    <h3>
+                        No pitches yet
+                    </h3>
 
                     <p>
-                        Find founders, investors and
-                        consultants inside Delta.
+                        Create your first pitch and introduce
+                        your startup to Delta.
                     </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="showDashboardSection('pitch')">
+                        Create Pitch
+                    </button>
 
                 </div>
 
             </div>
 
+        </section>
+
+
+        <!-- =================================================
+             DISCOVER
+        ================================================== -->
+
+        <section
+            id="section-discover"
+            class="dash-section hidden">
+
+            <div class="section-label">
+                DISCOVER
+            </div>
+
+            <h1>
+                Meet the
+                <span>ecosystem.</span>
+            </h1>
+
+            <p class="section-description">
+                Discover founders, investors and consultants
+                across Delta.
+            </p>
+
 
             <div class="discover-controls">
 
-                <button
-                    class="filter-btn active"
-                    onclick="loadDiscover('')"
-                >
-                    All
-                </button>
+                <select id="discoverRole">
 
-                <button
-                    class="filter-btn"
-                    onclick="loadDiscover('Founder')"
-                >
-                    Founders
-                </button>
+                    <option value="">
+                        Everyone
+                    </option>
 
-                <button
-                    class="filter-btn"
-                    onclick="loadDiscover('Investor')"
-                >
-                    Investors
-                </button>
+                    <option value="Founder">
+                        Founders
+                    </option>
 
-                <button
-                    class="filter-btn"
-                    onclick="loadDiscover('Consultant')"
-                >
-                    Consultants
-                </button>
+                    <option value="Investor">
+                        Investors
+                    </option>
+
+                    <option value="Consultant">
+                        Consultants
+                    </option>
+
+                </select>
 
             </div>
 
 
             <div
                 id="discoverUsers"
-                class="discover-grid"
-            >
+                class="discover-grid">
 
                 <div class="empty-state">
-                    Loading people...
+
+                    <div class="empty-icon">
+                        Δ
+                    </div>
+
+                    <h3>
+                        Discover people
+                    </h3>
+
+                    <p>
+                        Explore the Delta ecosystem.
+                    </p>
+
                 </div>
 
             </div>
@@ -1658,45 +1935,54 @@
         </section>
 
 
-        <!-- ================================================
+        <!-- =================================================
              CONNECTIONS
-        ================================================= -->
+        ================================================== -->
 
         <section
-            id="connectionsSection"
-            class="dashboard-section"
-            style="display:none;"
-        >
+            id="section-connections"
+            class="dash-section hidden">
 
-            <div class="section-heading">
-
-                <div>
-
-                    <span class="eyebrow">
-                        YOUR NETWORK
-                    </span>
-
-                    <h2>
-                        Connections
-                    </h2>
-
-                    <p>
-                        Manage your connection requests
-                        and connected network.
-                    </p>
-
-                </div>
-
+            <div class="section-label">
+                CONNECTIONS
             </div>
+
+            <h1>
+                Your
+                <span>network.</span>
+            </h1>
+
+            <p class="section-description">
+                People you've connected with through Delta.
+            </p>
 
 
             <div
                 id="connectionsList"
-                class="connections-grid"
-            >
+                class="content-list">
 
                 <div class="empty-state">
-                    Loading connections...
+
+                    <div class="empty-icon">
+                        ↔
+                    </div>
+
+                    <h3>
+                        No connections yet
+                    </h3>
+
+                    <p>
+                        Start discovering people to build
+                        your network.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="showDashboardSection('discover')">
+                        Discover People
+                    </button>
+
                 </div>
 
             </div>
@@ -1704,63 +1990,82 @@
         </section>
 
 
-        <!-- ================================================
+        <!-- =================================================
              MESSAGES
-        ================================================= -->
+        ================================================== -->
 
         <section
-            id="messagesSection"
-            class="dashboard-section"
-            style="display:none;"
-        >
+            id="section-messages"
+            class="dash-section hidden">
 
-            <div class="section-heading">
-
-                <div>
-
-                    <span class="eyebrow">
-                        PRIVATE NETWORK
-                    </span>
-
-                    <h2>
-                        Messages
-                    </h2>
-
-                    <p>
-                        Message people after your
-                        connection request has been accepted.
-                    </p>
-
-                </div>
-
+            <div class="section-label">
+                DELTA MESSAGES
             </div>
+
+            <h1>
+                Your
+                <span>conversations.</span>
+            </h1>
+
+            <p class="section-description">
+                Talk to people you've connected with.
+            </p>
 
 
             <div class="messages-layout">
 
 
-                <!-- CONVERSATION LIST -->
+                <!-- CONVERSATIONS -->
 
-                <div class="conversation-list">
+                <aside class="conversation-panel">
 
-                    <div class="messages-panel-title">
-                        Conversations
+                    <div class="conversation-header">
+
+                        <div>
+                            <span class="mini-label">
+                                INBOX
+                            </span>
+
+                            <h3>
+                                Conversations
+                            </h3>
+                        </div>
+
+                        <span
+                            id="conversationCount"
+                            class="conversation-count">
+                            0
+                        </span>
+
                     </div>
+
 
                     <div
                         id="conversationList"
-                    >
+                        class="conversation-list">
 
-                        <div class="empty-state">
-                            No conversations yet.
+                        <div class="empty-conversations">
+
+                            <div class="empty-icon">
+                                ◇
+                            </div>
+
+                            <p>
+                                No conversations yet.
+                            </p>
+
+                            <small>
+                                Connect with someone to start messaging.
+                            </small>
+
                         </div>
 
                     </div>
 
-                </div>
+                </aside>
 
 
-                <!-- CHAT PANEL -->
+                <!-- CHAT -->
 
                 <div class="chat-panel">
 
@@ -1769,20 +2074,20 @@
 
                     <div
                         id="chatEmpty"
-                        class="chat-empty"
-                    >
+                        class="chat-empty">
 
                         <div class="chat-empty-symbol">
                             Δ
                         </div>
 
                         <h3>
-                            Select a conversation
+                            Your Delta network,
+                            <span>in conversation.</span>
                         </h3>
 
                         <p>
-                            Your accepted connections
-                            will appear here.
+                            Select an accepted connection to start
+                            a conversation.
                         </p>
 
                     </div>
@@ -1792,32 +2097,29 @@
 
                     <div
                         id="chatWindow"
-                        style="display:none;"
-                    >
+                        class="chat-window hidden">
+
+
+                        <!-- CHAT HEADER -->
 
                         <div class="chat-header">
 
-                            <div class="chat-user-heading">
+                            <div class="chat-user-info">
 
                                 <div
                                     id="chatUserAvatar"
-                                    class="conversation-avatar"
-                                >
-                                    D
+                                    class="chat-avatar">
+                                    Δ
                                 </div>
 
                                 <div>
 
-                                    <h3
-                                        id="chatUserName"
-                                    >
-                                        User
-                                    </h3>
+                                    <strong id="chatUserName">
+                                        Delta Member
+                                    </strong>
 
-                                    <span
-                                        id="chatUserRole"
-                                    >
-                                        Founder
+                                    <span id="chatUserRole">
+                                        Member
                                     </span>
 
                                 </div>
@@ -1827,40 +2129,44 @@
                         </div>
 
 
+                        <!-- MESSAGES -->
+
                         <div
                             id="chatMessages"
-                            class="chat-messages"
-                        ></div>
+                            class="chat-messages">
+                        </div>
 
+
+                        <!-- MESSAGE FORM -->
 
                         <form
                             id="messageForm"
-                            class="message-form"
-                        >
+                            class="message-form">
 
-                            <input
-                                type="text"
-                                id="messageInput"
-                                placeholder="Write a message..."
-                                maxlength="5000"
-                                autocomplete="off"
-                            >
+                            <div class="message-input-wrap">
 
-                            <button
-                                type="submit"
-                                class="primary-btn"
-                            >
-                                Send
-                                <span>↗</span>
-                            </button>
+                                <input
+                                    type="text"
+                                    id="messageInput"
+                                    maxlength="5000"
+                                    autocomplete="off"
+                                    placeholder="Write a message..."
+                                    required>
+
+                                <button
+                                    type="submit"
+                                    class="message-send-button">
+                                    →
+                                </button>
+
+                            </div>
+
+                            <div
+                                id="messageStatus"
+                                class="message-status">
+                            </div>
 
                         </form>
-
-
-                        <p
-                            id="messageStatus"
-                            class="form-message"
-                        ></p>
 
                     </div>
 
@@ -1870,39 +2176,29 @@
 
         </section>
 
+    </section>
 
-    </main>
-
-</div>
+</main>
 
 
 <!-- =========================================================
-     PUBLIC ACTIVITY MODAL
+     ACTIVITY MODAL
 ========================================================= -->
 
 <div
     id="activityModal"
-    class="modal"
-    style="display:none;"
->
+    class="modal">
 
     <div
-        class="modal-overlay"
-        onclick="closeActivityModal()"
-    ></div>
-
-    <div class="activity-modal">
+        class="modal-box activity-modal-box">
 
         <button
             class="modal-close"
-            onclick="closeActivityModal()"
-        >
+            onclick="closeActivityModal()">
             ×
         </button>
 
-        <div
-            id="activityModalContent"
-        ></div>
+        <div id="activityModalContent"></div>
 
     </div>
 
@@ -1915,71 +2211,20 @@
 
 <footer class="footer">
 
-    <div class="footer-top">
-
-        <div>
-
-            <div class="footer-brand">
-
-                <span class="delta-mark">
-                    Δ
-                </span>
-
-                DELTA
-
-            </div>
-
-            <p>
-                Entrepreneurship,
-                without borders.
-            </p>
-
-        </div>
-
-
-        <div class="footer-links">
-
-            <a href="#home">
-                Home
-            </a>
-
-            <a href="#about">
-                About
-            </a>
-
-            <a href="#ecosystem">
-                Ecosystem
-            </a>
-
-            <button
-                onclick="openAuth('register')"
-            >
-                Join Delta
-            </button>
-
-        </div>
-
+    <div class="footer-logo">
+        DELTA
     </div>
 
+    <p>
+        Promoting entrepreneurship globally.
+    </p>
 
-    <div class="footer-bottom">
-
-        <span>
-            © 2026 Delta
-        </span>
-
-        <span>
-            BUILD · CONNECT · SCALE
-        </span>
-
-    </div>
+    <span>
+        © 2026 Delta. All rights reserved.
+    </span>
 
 </footer>
 
-
-<!-- =========================================================
-     JAVASCRIPT
-========================================================= -->
 
 <script src="app.js"></script>
 
