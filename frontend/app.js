@@ -2,7 +2,7 @@
    DELTA FRONTEND JAVASCRIPT
 ========================================================= */
 
-const API_URL = "https://delta-6.onrender.com";
+const API_URL = "https://delta-7.onrender.com";
 
 /* =========================================================
    DOM ELEMENTS
