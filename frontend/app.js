@@ -1,50 +1,89 @@
 /* =========================================================
-   DELTA FRONTEND JAVASCRIPT
+   DELTA — FOUNDER NETWORK
+   APP.JS
 ========================================================= */
 
 const API_URL = "https://delta-5.onrender.com";
 
-/* =========================================================
-   DOM ELEMENTS
-========================================================= */
-
-const authModal = document.getElementById("authModal");
-const authChoice = document.getElementById("authChoice");
-const registerForm = document.getElementById("registerForm");
-const loginFormWrap = document.getElementById("loginFormWrap");
-const loginForm = document.getElementById("loginForm");
-
-const continueButton = document.getElementById("continueButton");
-const selectedRole = document.getElementById("selectedRole");
-const roleText = document.getElementById("roleText");
-
-const registerMessage = document.getElementById("registerMessage");
-const loginMessage = document.getElementById("loginMessage");
-
-const landingPage = document.getElementById("landingPage");
-const dashboardPage = document.getElementById("dashboardPage");
-const footer = document.querySelector(".footer");
-
-let selectedUserRole = null;
 
 /* =========================================================
-   API HELPER
+   GLOBAL STATE
 ========================================================= */
+
+let currentUser = null;
+let currentProfile = null;
+let currentStartup = null;
+let selectedConversation = null;
+let selectedPostType = "Idea";
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = (id) => document.getElementById(id);
+
+function getToken() {
+    return localStorage.getItem("deltaToken");
+}
+
+function getStoredUser() {
+    try {
+        return JSON.parse(localStorage.getItem("deltaUser"));
+    } catch {
+        return null;
+    }
+}
+
+function escapeHTML(value = "") {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function initials(name = "Delta") {
+    return name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(word => word[0])
+        .join("")
+        .toUpperCase();
+}
+
+function showMessage(element, message, type = "") {
+    if (!element) return;
+
+    element.textContent = message;
+    element.className = "form-message";
+
+    if (type) {
+        element.classList.add(type);
+    }
+}
+
+function showElement(element) {
+    if (element) element.classList.remove("hidden");
+}
+
+function hideElement(element) {
+    if (element) element.classList.add("hidden");
+}
 
 async function apiRequest(endpoint, options = {}) {
 
-    const token = localStorage.getItem("deltaToken");
+    const token = getToken();
 
     const headers = {
+        "Content-Type": "application/json",
         ...(options.headers || {})
     };
 
-    if (options.body) {
-        headers["Content-Type"] = "application/json";
-    }
-
     if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+        headers.Authorization = `Bearer ${token}`;
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -56,14 +95,13 @@ async function apiRequest(endpoint, options = {}) {
 
     try {
         data = await response.json();
-    } catch (error) {
+    } catch {
         data = {};
     }
 
     if (!response.ok) {
         throw new Error(
             data.message ||
-            data.error ||
             `Request failed (${response.status})`
         );
     }
@@ -71,110 +109,37 @@ async function apiRequest(endpoint, options = {}) {
     return data;
 }
 
+
 /* =========================================================
    AUTH MODAL
 ========================================================= */
 
-function openJoin(role = null) {
+const authModal = $("authModal");
+const authChoice = $("authChoice");
+const registerForm = $("registerForm");
+const loginFormWrap = $("loginFormWrap");
+const loginForm = $("loginForm");
 
-    if (!authModal) return;
+const continueButton = $("continueButton");
+const selectedRole = $("selectedRole");
+const roleText = $("roleText");
 
-    authModal.classList.add("active");
-    authModal.classList.remove("hidden");
+const registerMessage = $("registerMessage");
+const loginMessage = $("loginMessage");
 
-    if (role) {
-        selectedUserRole = role;
 
-        if (selectedRole) {
-            selectedRole.textContent = `Selected role: ${role}`;
-            selectedRole.dataset.role = role;
-        }
+let chosenRole = "Founder";
 
-        if (roleText) {
-            roleText.textContent = role;
-        }
-    } else {
-        selectedUserRole = null;
 
-        if (selectedRole) {
-            selectedRole.textContent = "";
-            selectedRole.dataset.role = "";
-        }
+function openJoin() {
+    showElement(authModal);
 
-        if (roleText) {
-            roleText.textContent = "";
-        }
-    }
-
-    showRoles();
-
-    document.body.style.overflow = "hidden";
-}
-
-function closeJoin() {
-
-    if (!authModal) return;
-
-    authModal.classList.remove("active");
-    authModal.classList.add("hidden");
-
-    document.body.style.overflow = "";
-}
-
-/* =========================================================
-   AUTH SCREENS
-========================================================= */
-
-function showRoles() {
-
-    if (authChoice) {
-        authChoice.classList.remove("hidden");
-    }
-
-    if (registerForm) {
-        registerForm.classList.add("hidden");
-    }
-
-    if (loginFormWrap) {
-        loginFormWrap.classList.add("hidden");
-    }
-}
-
-function showRegister() {
-
-    if (authChoice) {
-        authChoice.classList.add("hidden");
-    }
-
-    if (registerForm) {
-        registerForm.classList.remove("hidden");
-    }
-
-    if (loginFormWrap) {
-        loginFormWrap.classList.add("hidden");
-    }
+    showElement(authChoice);
+    hideElement(registerForm);
+    hideElement(loginFormWrap);
 
     if (registerMessage) {
         registerMessage.textContent = "";
-    }
-
-    if (selectedUserRole && roleText) {
-        roleText.textContent = selectedUserRole;
-    }
-}
-
-function showLogin() {
-
-    if (authChoice) {
-        authChoice.classList.add("hidden");
-    }
-
-    if (registerForm) {
-        registerForm.classList.add("hidden");
-    }
-
-    if (loginFormWrap) {
-        loginFormWrap.classList.remove("hidden");
     }
 
     if (loginMessage) {
@@ -182,143 +147,154 @@ function showLogin() {
     }
 }
 
-/* =========================================================
-   COMPATIBILITY FUNCTIONS
-   These match the onclick names in index.html
-========================================================= */
 
-function showRegisterForm() {
-
-    if (!selectedUserRole) {
-
-        if (selectedRole) {
-            selectedRole.textContent = "Please select a role first.";
-        }
-
-        return;
-    }
-
-    showRegister();
+function closeJoin() {
+    hideElement(authModal);
 }
 
-function showLoginForm() {
-    showLogin();
-}
-
-function showRegisterChoice() {
-    showRoles();
-}
-
-/* =========================================================
-   ROLE SELECTION
-========================================================= */
 
 function chooseRole(role) {
 
-    selectedUserRole = role;
+    chosenRole = role;
 
     if (selectedRole) {
-        selectedRole.textContent = `Selected role: ${role}`;
-        selectedRole.dataset.role = role;
+        selectedRole.value = role;
     }
 
     if (roleText) {
         roleText.textContent = role;
     }
+
+    showRegisterForm();
 }
 
+
+function showRegisterForm() {
+
+    hideElement(authChoice);
+    showElement(registerForm);
+    hideElement(loginFormWrap);
+
+    if (selectedRole) {
+        selectedRole.value = chosenRole;
+    }
+}
+
+
+function showLoginForm() {
+
+    hideElement(authChoice);
+    hideElement(registerForm);
+    showElement(loginFormWrap);
+}
+
+
+function showRegisterChoice() {
+
+    showElement(authChoice);
+    hideElement(registerForm);
+    hideElement(loginFormWrap);
+}
+
+
+window.openJoin = openJoin;
+window.closeJoin = closeJoin;
+window.chooseRole = chooseRole;
+window.showRegisterForm = showRegisterForm;
+window.showLoginForm = showLoginForm;
+window.showRegisterChoice = showRegisterChoice;
+
+
 /* =========================================================
-   REGISTRATION
+   REGISTER
 ========================================================= */
 
 if (registerForm) {
 
-    registerForm.addEventListener("submit", async function (event) {
+    registerForm.addEventListener("submit", async (event) => {
 
         event.preventDefault();
 
-        const nameElement = document.getElementById("name");
-        const emailElement = document.getElementById("email");
-        const passwordElement = document.getElementById("password");
-
-        const name = nameElement ? nameElement.value.trim() : "";
-        const email = emailElement ? emailElement.value.trim() : "";
-        const password = passwordElement ? passwordElement.value : "";
+        const name = $("registerName")?.value.trim();
+        const email = $("registerEmail")?.value.trim();
+        const password = $("registerPassword")?.value;
 
         if (!name || !email || !password) {
 
-            if (registerMessage) {
-                registerMessage.textContent =
-                    "Please fill all required fields.";
-            }
+            showMessage(
+                registerMessage,
+                "Please complete all fields.",
+                "error"
+            );
 
             return;
-        }
-
-        if (!selectedUserRole) {
-
-            if (registerMessage) {
-                registerMessage.textContent =
-                    "Please select a role.";
-            }
-
-            return;
-        }
-
-        if (password.length < 6) {
-
-            if (registerMessage) {
-                registerMessage.textContent =
-                    "Password must be at least 6 characters.";
-            }
-
-            return;
-        }
-
-        if (registerMessage) {
-            registerMessage.textContent = "Creating your account...";
         }
 
         try {
 
-            const data = await apiRequest("/api/auth/register", {
-                method: "POST",
-                body: JSON.stringify({
-                    name,
-                    email,
-                    password,
-                    role: selectedUserRole
-                })
-            });
+            showMessage(
+                registerMessage,
+                "Creating your Delta account..."
+            );
 
-            if (!data.success) {
-                throw new Error(
-                    data.message || "Registration failed."
+            const data = await apiRequest(
+                "/api/auth/register",
+                {
+                    method: "POST",
+
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password,
+                        role: chosenRole
+                    })
+                }
+            );
+
+            if (data.token) {
+
+                localStorage.setItem(
+                    "deltaToken",
+                    data.token
                 );
             }
 
-            if (registerMessage) {
-                registerMessage.textContent =
-                    "Account created successfully. Please login.";
+            if (data.user) {
+
+                localStorage.setItem(
+                    "deltaUser",
+                    JSON.stringify(data.user)
+                );
             }
 
-            registerForm.reset();
+            currentUser = data.user;
 
-            setTimeout(function () {
-                showLogin();
-            }, 900);
+            showMessage(
+                registerMessage,
+                "Account created successfully.",
+                "success"
+            );
+
+            setTimeout(() => {
+
+                closeJoin();
+
+                openDashboard();
+
+            }, 500);
 
         } catch (error) {
 
-            console.error("Registration error:", error);
-
-            if (registerMessage) {
-                registerMessage.textContent =
-                    error.message || "Registration failed.";
-            }
+            showMessage(
+                registerMessage,
+                error.message,
+                "error"
+            );
         }
+
     });
 }
+
 
 /* =========================================================
    LOGIN
@@ -326,442 +302,1231 @@ if (registerForm) {
 
 if (loginForm) {
 
-    loginForm.addEventListener("submit", async function (event) {
+    loginForm.addEventListener("submit", async (event) => {
 
         event.preventDefault();
 
-        const emailElement = document.getElementById("loginEmail");
-        const passwordElement = document.getElementById("loginPassword");
-
-        const email = emailElement
-            ? emailElement.value.trim()
-            : "";
-
-        const password = passwordElement
-            ? passwordElement.value
-            : "";
+        const email = $("loginEmail")?.value.trim();
+        const password = $("loginPassword")?.value;
 
         if (!email || !password) {
 
-            if (loginMessage) {
-                loginMessage.textContent =
-                    "Please enter email and password.";
-            }
+            showMessage(
+                loginMessage,
+                "Please enter your email and password.",
+                "error"
+            );
 
             return;
         }
 
-        if (loginMessage) {
-            loginMessage.textContent = "Logging in...";
-        }
-
         try {
 
-            const data = await apiRequest("/api/auth/login", {
-                method: "POST",
-                body: JSON.stringify({
-                    email,
-                    password
-                })
-            });
+            showMessage(
+                loginMessage,
+                "Signing you in..."
+            );
 
-            if (!data.success) {
-                throw new Error(
-                    data.message || "Login failed."
-                );
-            }
+            const data = await apiRequest(
+                "/api/auth/login",
+                {
+                    method: "POST",
 
-            if (!data.token) {
-                throw new Error(
-                    "Login succeeded but no authentication token was received."
-                );
-            }
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+                }
+            );
 
-            /* Save session */
-            localStorage.setItem("deltaToken", data.token);
+            localStorage.setItem(
+                "deltaToken",
+                data.token
+            );
 
-            if (data.user) {
-                localStorage.setItem(
-                    "deltaUser",
-                    JSON.stringify(data.user)
-                );
-            }
+            localStorage.setItem(
+                "deltaUser",
+                JSON.stringify(data.user)
+            );
 
-            if (loginMessage) {
-                loginMessage.textContent =
-                    "Login successful. Opening dashboard...";
-            }
+            currentUser = data.user;
 
-            /* IMPORTANT:
-               Close modal and immediately open dashboard */
-            setTimeout(function () {
+            showMessage(
+                loginMessage,
+                "Login successful.",
+                "success"
+            );
+
+            setTimeout(() => {
 
                 closeJoin();
+
                 openDashboard();
 
-            }, 300);
+            }, 400);
 
         } catch (error) {
 
-            console.error("Login error:", error);
-
-            if (loginMessage) {
-                loginMessage.textContent =
-                    error.message || "Login failed.";
-            }
+            showMessage(
+                loginMessage,
+                error.message,
+                "error"
+            );
         }
+
     });
 }
 
-/* =========================================================
-   CURRENT USER
-========================================================= */
-
-function getCurrentUser() {
-
-    try {
-
-        const user = localStorage.getItem("deltaUser");
-
-        if (!user) {
-            return null;
-        }
-
-        return JSON.parse(user);
-
-    } catch (error) {
-
-        console.error("User parsing error:", error);
-
-        return null;
-    }
-}
 
 /* =========================================================
-   OPEN DASHBOARD
+   DASHBOARD ELEMENTS
 ========================================================= */
 
-function openDashboard() {
+const landingPage = $("landingPage");
+const dashboardPage = $("dashboardPage");
 
-    const user = getCurrentUser();
+const dashboardGreeting = $("dashboardGreeting");
+const userBadge = $("userBadge");
 
-    if (!user) {
-        return;
-    }
+const sectionDashboard = $("section-dashboard");
+const sectionFounderHome = $("section-founder-home");
+const sectionProfile = $("section-profile");
+const sectionStartup = $("section-startup");
+const sectionCreatePost = $("section-create-post");
+const sectionPitch = $("section-pitch");
+const sectionPitches = $("section-pitches");
+const sectionDiscover = $("section-discover");
+const sectionConnections = $("section-connections");
+const sectionMessages = $("section-messages");
+const sectionGroups = $("section-groups");
 
-    /* Hide landing */
-    if (landingPage) {
-        landingPage.classList.add("hidden");
-        landingPage.style.display = "none";
-    }
+const allSections = document.querySelectorAll(".dash-section");
 
-    /* Hide footer */
-    if (footer) {
-        footer.classList.add("hidden");
-    }
-
-    /* Show dashboard */
-    if (dashboardPage) {
-
-        dashboardPage.classList.remove("hidden");
-
-        dashboardPage.style.display = "flex";
-        dashboardPage.style.visibility = "visible";
-        dashboardPage.style.opacity = "1";
-    }
-
-    /* Greeting */
-    const dashboardGreeting =
-        document.getElementById("dashboardGreeting");
-
-    const userBadge =
-        document.getElementById("userBadge");
-
-    if (dashboardGreeting) {
-        dashboardGreeting.textContent =
-            `Welcome, ${user.name || "Founder"}.`;
-    }
-
-    if (userBadge) {
-        userBadge.textContent =
-            user.role || "Member";
-    }
-
-    showDashboardSection("dashboard");
-    loadDashboard();
-}
 
 /* =========================================================
-   DASHBOARD NAVIGATION
+   SIDEBAR NAVIGATION
 ========================================================= */
+
+const navItems = document.querySelectorAll(
+    ".dashboard-nav-item[data-section]"
+);
+
 
 function showDashboardSection(section) {
 
-    document.querySelectorAll(".dash-section").forEach(function (item) {
+    allSections.forEach(item => {
         item.classList.add("hidden");
     });
 
-    const target =
-        document.getElementById(`section-${section}`);
+    const target = document.getElementById(
+        `section-${section}`
+    );
 
     if (target) {
         target.classList.remove("hidden");
     }
 
-    /* Correct active state without requiring data-section
-       attributes in index.html */
+    navItems.forEach(item => {
 
-    const sections = [
-        "dashboard",
-        "profile",
-        "pitch",
-        "pitches",
-        "discover",
-        "connections"
-    ];
+        item.classList.toggle(
+            "active",
+            item.dataset.section === section
+        );
 
-    document.querySelectorAll(".side-link").forEach(function (link, index) {
-
-        link.classList.remove("active");
-
-        if (sections[index] === section) {
-            link.classList.add("active");
-        }
     });
 
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+
+    /* Load data depending on section */
+
+    if (section === "founder-home") {
+
+        loadFounderHome();
+    }
+
     if (section === "profile") {
+
         loadProfile();
     }
 
+    if (section === "startup") {
+
+        loadStartup();
+    }
+
     if (section === "pitches") {
+
         loadMyPitches();
     }
 
     if (section === "discover") {
+
         loadDiscover();
     }
 
     if (section === "connections") {
+
         loadConnections();
+    }
+
+    if (section === "messages") {
+
+        loadConversations();
+    }
+
+    if (section === "groups") {
+
+        loadGroups();
+    }
+
+}
+
+
+window.showDashboardSection = showDashboardSection;
+
+
+navItems.forEach(item => {
+
+    item.addEventListener("click", () => {
+
+        const section = item.dataset.section;
+
+        if (section) {
+            showDashboardSection(section);
+        }
+
+    });
+
+});
+
+
+/* =========================================================
+   OPEN DASHBOARD
+========================================================= */
+
+async function openDashboard() {
+
+    hideElement(landingPage);
+    showElement(dashboardPage);
+
+    currentUser =
+        currentUser ||
+        getStoredUser();
+
+    updateUserUI();
+
+    await loadProfile();
+
+    if (currentUser?.role === "Founder") {
+
+        showFounderNavigation();
+
+        showDashboardSection("founder-home");
+
+    } else {
+
+        hideFounderNavigation();
+
+        showDashboardSection("dashboard");
+
     }
 }
 
+
 /* =========================================================
-   DASHBOARD LOAD
+   USER UI
 ========================================================= */
 
-async function loadDashboard() {
+function updateUserUI() {
 
-    await Promise.allSettled([
-        loadProfile(),
-        loadMyPitches(),
-        loadConnections()
-    ]);
+    if (!currentUser) return;
+
+    const name =
+        currentUser.name ||
+        "Founder";
+
+    if (dashboardGreeting) {
+
+        dashboardGreeting.textContent =
+            `Welcome back, ${name}.`;
+
+    }
+
+    if (userBadge) {
+
+        userBadge.textContent =
+            initials(name);
+
+    }
+
+    const sidebarName =
+        $("sidebarUserName");
+
+    const sidebarRole =
+        $("sidebarUserRole");
+
+    if (sidebarName) {
+        sidebarName.textContent = name;
+    }
+
+    if (sidebarRole) {
+        sidebarRole.textContent =
+            currentUser.role || "Member";
+    }
+
+    const founderNameElements =
+        document.querySelectorAll(
+            "[data-founder-name]"
+        );
+
+    founderNameElements.forEach(element => {
+
+        element.textContent = name;
+
+    });
+
+    const founderInitialElements =
+        document.querySelectorAll(
+            "[data-founder-initials]"
+        );
+
+    founderInitialElements.forEach(element => {
+
+        element.textContent =
+            initials(name);
+
+    });
+
 }
+
+
+/* =========================================================
+   FOUNDER NAVIGATION
+========================================================= */
+
+function showFounderNavigation() {
+
+    document
+        .querySelectorAll(".founder-only")
+        .forEach(element => {
+
+            element.classList.remove("hidden");
+
+        });
+
+}
+
+
+function hideFounderNavigation() {
+
+    document
+        .querySelectorAll(".founder-only")
+        .forEach(element => {
+
+            element.classList.add("hidden");
+
+        });
+
+}
+
 
 /* =========================================================
    PROFILE
 ========================================================= */
+
+const profileForm = $("profileForm");
+
 
 async function loadProfile() {
 
     try {
 
         const data =
-            await apiRequest("/api/profiles/me");
+            await apiRequest(
+                "/api/profiles/me"
+            );
 
-        const profile =
-            data.profile || data.data || data;
+        currentUser =
+            data.user ||
+            currentUser;
 
-        if (!profile) {
-            return;
-        }
+        currentProfile =
+            data.profile ||
+            null;
 
-        const fields = {
-            profileName: profile.name || "",
-            startupName: profile.startupName || "",
-            industry: profile.industry || "",
-            location: profile.location || "",
-            stage: profile.stage || "",
-            website: profile.website || "",
-            bio: profile.bio || ""
-        };
+        updateUserUI();
 
-        Object.keys(fields).forEach(function (id) {
+        fillProfileForm();
 
-            const element =
-                document.getElementById(id);
-
-            if (element) {
-                element.value = fields[id];
-            }
-        });
-
-        const profileStatus =
-            document.getElementById("profileStatus");
-
-        if (profileStatus) {
-
-            const completed =
-                profile.name &&
-                profile.industry &&
-                profile.bio;
-
-            profileStatus.textContent =
-                completed ? "Complete" : "Incomplete";
-        }
+        updateFounderIdentity();
 
     } catch (error) {
 
-        console.log("Profile load:", error.message);
+        console.error(
+            "Profile loading failed:",
+            error
+        );
     }
+
 }
 
-/* =========================================================
-   SAVE PROFILE
-========================================================= */
 
-const profileForm =
-    document.getElementById("profileForm");
+function fillProfileForm() {
+
+    if (!currentUser) return;
+
+    if ($("profileName")) {
+
+        $("profileName").value =
+            currentUser.name || "";
+
+    }
+
+    if (!currentProfile) return;
+
+    const fields = [
+        "startupName",
+        "idea",
+        "industry",
+        "location",
+        "stage",
+        "website",
+        "bio",
+        "profilePhoto"
+    ];
+
+    fields.forEach(field => {
+
+        const element =
+            $(field);
+
+        if (
+            element &&
+            currentProfile[field] !== undefined
+        ) {
+
+            element.value =
+                currentProfile[field] || "";
+
+        }
+
+    });
+
+}
+
+
+function updateFounderIdentity() {
+
+    const name =
+        currentUser?.name ||
+        "Founder";
+
+    const nameElements =
+        document.querySelectorAll(
+            "[data-founder-name]"
+        );
+
+    nameElements.forEach(element => {
+
+        element.textContent = name;
+
+    });
+
+    const roleElements =
+        document.querySelectorAll(
+            "[data-founder-role]"
+        );
+
+    roleElements.forEach(element => {
+
+        element.textContent =
+            currentUser?.role || "Founder";
+
+    });
+
+    if (currentProfile) {
+
+        const startupName =
+            currentProfile.startupName ||
+            "Your Startup";
+
+        document
+            .querySelectorAll(
+                "[data-startup-name]"
+            )
+            .forEach(element => {
+
+                element.textContent =
+                    startupName;
+
+            });
+
+    }
+
+}
+
 
 if (profileForm) {
 
-    profileForm.addEventListener("submit", async function (event) {
+    profileForm.addEventListener(
+        "submit",
+        async event => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const profileMessage =
-            document.getElementById("profileMessage");
+            const status =
+                $("profileStatus");
 
-        const payload = {
-            name: getValue("profileName"),
-            startupName: getValue("startupName"),
-            industry: getValue("industry"),
-            location: getValue("location"),
-            stage: getValue("stage"),
-            website: getValue("website"),
-            bio: getValue("bio")
-        };
+            try {
 
-        if (profileMessage) {
-            profileMessage.textContent =
-                "Saving profile...";
+                showMessage(
+                    status,
+                    "Saving profile..."
+                );
+
+                const payload = {
+                    startupName:
+                        $("startupName")?.value.trim() || "",
+
+                    idea:
+                        $("idea")?.value.trim() || "",
+
+                    industry:
+                        $("industry")?.value.trim() || "",
+
+                    location:
+                        $("location")?.value.trim() || "",
+
+                    stage:
+                        $("stage")?.value.trim() || "",
+
+                    website:
+                        $("website")?.value.trim() || "",
+
+                    bio:
+                        $("bio")?.value.trim() || "",
+
+                    profilePhoto:
+                        $("profilePhoto")?.value.trim() || ""
+                };
+
+                const data =
+                    await apiRequest(
+                        "/api/profiles/me",
+                        {
+                            method: "PUT",
+                            body: JSON.stringify(payload)
+                        }
+                    );
+
+                currentProfile =
+                    data.profile;
+
+                updateFounderIdentity();
+
+                showMessage(
+                    status,
+                    "Profile updated successfully.",
+                    "success"
+                );
+
+                await loadFounderHome();
+
+            } catch (error) {
+
+                showMessage(
+                    status,
+                    error.message,
+                    "error"
+                );
+
+            }
+
         }
+    );
 
-        try {
-
-            const data =
-                await apiRequest("/api/profiles/me", {
-                    method: "PUT",
-                    body: JSON.stringify(payload)
-                });
-
-            if (profileMessage) {
-                profileMessage.textContent =
-                    data.message ||
-                    "Profile saved successfully.";
-            }
-
-            const profileStatus =
-                document.getElementById("profileStatus");
-
-            if (profileStatus) {
-                profileStatus.textContent = "Complete";
-            }
-
-        } catch (error) {
-
-            console.error("Profile save:", error);
-
-            if (profileMessage) {
-                profileMessage.textContent =
-                    error.message || "Failed to save profile.";
-            }
-        }
-    });
 }
 
+
 /* =========================================================
-   CREATE PITCH
+   FOUNDER HOME
+========================================================= */
+
+async function loadFounderHome() {
+
+    updateFounderIdentity();
+
+    await loadFounderFeed();
+
+    await loadConnectionPreview();
+
+    await loadGroupPreview();
+
+}
+
+
+/* =========================================================
+   FOUNDER FEED
+========================================================= */
+
+const founderFeed =
+    $("founderFeed");
+
+
+async function loadFounderFeed() {
+
+    if (!founderFeed) return;
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/posts/feed"
+            );
+
+        const posts =
+            data.posts ||
+            data.data ||
+            [];
+
+        renderPosts(posts);
+
+    } catch (error) {
+
+        console.error(
+            "Feed loading failed:",
+            error
+        );
+
+        founderFeed.innerHTML = `
+            <div class="empty-feed">
+                <div class="empty-feed-symbol">Δ</div>
+                <h3>Your founder feed starts here.</h3>
+                <p>
+                    Publish your first idea and start
+                    conversations with other founders.
+                </p>
+            </div>
+        `;
+    }
+
+}
+
+
+function renderPosts(posts) {
+
+    if (!founderFeed) return;
+
+    if (!posts.length) {
+
+        founderFeed.innerHTML = `
+            <div class="empty-feed">
+                <div class="empty-feed-symbol">✦</div>
+
+                <h3>No ideas yet.</h3>
+
+                <p>
+                    Be the first founder to publish an
+                    idea, update, achievement or opportunity.
+                </p>
+
+                <button
+                    class="btn btn-outline btn-small"
+                    onclick="showDashboardSection('create-post')"
+                >
+                    Publish an idea
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+    founderFeed.innerHTML =
+        posts.map(renderPost).join("");
+
+}
+
+
+function renderPost(post) {
+
+    const author =
+        post.author?.name ||
+        post.user?.name ||
+        "Founder";
+
+    const avatar =
+        post.author?.profilePhoto ||
+        post.user?.profilePhoto ||
+        "";
+
+    const content =
+        post.content ||
+        "";
+
+    const type =
+        post.type ||
+        "Idea";
+
+    const media =
+        post.mediaUrl ||
+        post.image ||
+        "";
+
+    const postId =
+        post._id ||
+        post.id;
+
+    const avatarHTML =
+        avatar
+            ? `<img src="${escapeHTML(avatar)}" alt="">`
+            : initials(author);
+
+    const mediaHTML =
+        media
+            ? `
+                <div class="post-media">
+                    <img
+                        src="${escapeHTML(media)}"
+                        alt="Post media"
+                        loading="lazy"
+                    >
+                </div>
+              `
+            : "";
+
+    return `
+        <article
+            class="post-card"
+            data-post-id="${escapeHTML(postId || "")}"
+        >
+
+            <div class="post-author">
+
+                <div class="avatar avatar-small">
+                    ${avatarHTML}
+                </div>
+
+                <div class="post-author-info">
+
+                    <strong>
+                        ${escapeHTML(author)}
+                    </strong>
+
+                    <span>
+                        Founder
+                    </span>
+
+                </div>
+
+                <span class="post-type-badge">
+                    ${escapeHTML(type)}
+                </span>
+
+            </div>
+
+            <div class="post-content">
+                ${escapeHTML(content)}
+            </div>
+
+            ${mediaHTML}
+
+            <div class="post-actions">
+
+                <button
+                    class="post-action"
+                    onclick="likePost('${escapeHTML(postId || "")}')"
+                >
+                    ♡ Like
+                </button>
+
+                <button
+                    class="post-action"
+                    onclick="focusPostComment('${escapeHTML(postId || "")}')"
+                >
+                    ◌ Comment
+                </button>
+
+                <button
+                    class="post-action"
+                    onclick="sharePost('${escapeHTML(postId || "")}')"
+                >
+                    ↗ Share
+                </button>
+
+                <span class="post-time">
+                    ${formatDate(post.createdAt)}
+                </span>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+/* =========================================================
+   CREATE POST
+========================================================= */
+
+const createPostForm =
+    $("createPostForm");
+
+
+document
+    .querySelectorAll(".post-type")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                selectedPostType =
+                    button.dataset.type ||
+                    button.textContent.trim();
+
+                document
+                    .querySelectorAll(".post-type")
+                    .forEach(item =>
+                        item.classList.remove("active")
+                    );
+
+                button.classList.add("active");
+
+                const hiddenType =
+                    $("postType");
+
+                if (hiddenType) {
+                    hiddenType.value =
+                        selectedPostType;
+                }
+
+            }
+        );
+
+    });
+
+
+if (createPostForm) {
+
+    createPostForm.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+            const status =
+                $("postStatus");
+
+            const content =
+                $("postContent")?.value.trim();
+
+            const mediaUrl =
+                $("postMediaUrl")?.value.trim() ||
+                "";
+
+            if (!content) {
+
+                showMessage(
+                    status,
+                    "Write something before publishing.",
+                    "error"
+                );
+
+                return;
+            }
+
+            try {
+
+                showMessage(
+                    status,
+                    "Publishing..."
+                );
+
+                await apiRequest(
+                    "/api/posts",
+                    {
+                        method: "POST",
+
+                        body: JSON.stringify({
+                            type: selectedPostType,
+                            content,
+                            mediaUrl
+                        })
+                    }
+                );
+
+                createPostForm.reset();
+
+                selectedPostType = "Idea";
+
+                document
+                    .querySelectorAll(".post-type")
+                    .forEach(button =>
+                        button.classList.remove("active")
+                    );
+
+                document
+                    .querySelector(
+                        '.post-type[data-type="Idea"]'
+                    )
+                    ?.classList.add("active");
+
+                showMessage(
+                    status,
+                    "Published successfully.",
+                    "success"
+                );
+
+                await loadFounderFeed();
+
+                setTimeout(() => {
+
+                    showDashboardSection(
+                        "founder-home"
+                    );
+
+                }, 500);
+
+            } catch (error) {
+
+                showMessage(
+                    status,
+                    error.message,
+                    "error"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LIKE / SHARE PLACEHOLDERS
+========================================================= */
+
+async function likePost(postId) {
+
+    if (!postId) return;
+
+    try {
+
+        await apiRequest(
+            `/api/posts/${postId}/like`,
+            {
+                method: "POST"
+            }
+        );
+
+        await loadFounderFeed();
+
+    } catch (error) {
+
+        console.error(
+            "Like failed:",
+            error
+        );
+    }
+
+}
+
+
+function focusPostComment(postId) {
+
+    const commentBox =
+        document.querySelector(
+            `[data-post-id="${postId}"]`
+        );
+
+    if (commentBox) {
+
+        commentBox.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+    }
+
+}
+
+
+async function sharePost(postId) {
+
+    const url =
+        `${window.location.origin}${window.location.pathname}#post-${postId}`;
+
+    try {
+
+        if (navigator.share) {
+
+            await navigator.share({
+                title: "Delta Founder Post",
+                url
+            });
+
+        } else {
+
+            await navigator.clipboard.writeText(url);
+
+            alert("Post link copied.");
+
+        }
+
+    } catch {
+        /* User cancelled share */
+    }
+
+}
+
+
+window.likePost = likePost;
+window.focusPostComment = focusPostComment;
+window.sharePost = sharePost;
+
+
+/* =========================================================
+   STARTUP
+========================================================= */
+
+const startupForm =
+    $("startupForm");
+
+
+async function loadStartup() {
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/startups/me"
+            );
+
+        currentStartup =
+            data.startup ||
+            data.data ||
+            null;
+
+        fillStartupForm();
+
+    } catch (error) {
+
+        console.error(
+            "Startup loading failed:",
+            error
+        );
+
+    }
+
+}
+
+
+function fillStartupForm() {
+
+    if (!currentStartup) return;
+
+    const fields = [
+        "name",
+        "logo",
+        "tagline",
+        "description",
+        "industry",
+        "stage",
+        "location",
+        "website",
+        "foundedYear"
+    ];
+
+    fields.forEach(field => {
+
+        const element =
+            $(`startup${capitalize(field)}`);
+
+        if (element) {
+
+            element.value =
+                currentStartup[field] || "";
+
+        }
+
+    });
+
+}
+
+
+if (startupForm) {
+
+    startupForm.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+            const status =
+                $("startupStatus");
+
+            const payload = {
+                name:
+                    $("startupNameField")?.value.trim() || "",
+
+                logo:
+                    $("startupLogo")?.value.trim() || "",
+
+                tagline:
+                    $("startupTagline")?.value.trim() || "",
+
+                description:
+                    $("startupDescription")?.value.trim() || "",
+
+                industry:
+                    $("startupIndustry")?.value.trim() || "",
+
+                stage:
+                    $("startupStage")?.value.trim() || "",
+
+                location:
+                    $("startupLocation")?.value.trim() || "",
+
+                website:
+                    $("startupWebsite")?.value.trim() || "",
+
+                foundedYear:
+                    $("startupFoundedYear")?.value || ""
+            };
+
+            try {
+
+                showMessage(
+                    status,
+                    "Saving startup..."
+                );
+
+                const data =
+                    await apiRequest(
+                        "/api/startups/me",
+                        {
+                            method: "PUT",
+                            body: JSON.stringify(payload)
+                        }
+                    );
+
+                currentStartup =
+                    data.startup ||
+                    data.data;
+
+                showMessage(
+                    status,
+                    "Startup profile saved.",
+                    "success"
+                );
+
+            } catch (error) {
+
+                showMessage(
+                    status,
+                    error.message,
+                    "error"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   PITCH
 ========================================================= */
 
 const pitchForm =
-    document.getElementById("pitchForm");
+    $("pitchForm");
+
 
 if (pitchForm) {
 
-    pitchForm.addEventListener("submit", async function (event) {
+    pitchForm.addEventListener(
+        "submit",
+        async event => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const pitchMessage =
-            document.getElementById("pitchMessage");
+            const status =
+                $("pitchStatusMessage");
 
-        const payload = {
-            title: getValue("pitchTitle"),
-            industry: getValue("pitchIndustry"),
-            stage: getValue("pitchStage"),
-            fundingRequired: getValue("fundingRequired"),
-            website: getValue("pitchWebsite"),
-           
-            description: getValue("pitchDescription")
-        };
+            const payload = {
+                title:
+                    $("pitchTitle")?.value.trim() || "",
 
-        if (!payload.title || !payload.description) {
+                industry:
+                    $("pitchIndustry")?.value.trim() || "",
 
-            if (pitchMessage) {
-                pitchMessage.textContent =
-                    "Please add a title and description.";
+                stage:
+                    $("pitchStage")?.value.trim() || "",
+
+                fundingRequired:
+                    Number(
+                        $("fundingRequired")?.value || 0
+                    ),
+
+                website:
+                    $("pitchWebsite")?.value.trim() || "",
+
+                description:
+                    $("pitchDescription")?.value.trim() || "",
+
+                status:
+                    $("pitchStatus")?.value ||
+                    "Draft"
+            };
+
+            try {
+
+                showMessage(
+                    status,
+                    "Creating pitch..."
+                );
+
+                await apiRequest(
+                    "/api/pitches",
+                    {
+                        method: "POST",
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                pitchForm.reset();
+
+                showMessage(
+                    status,
+                    "Pitch created successfully.",
+                    "success"
+                );
+
+                await loadMyPitches();
+
+            } catch (error) {
+
+                showMessage(
+                    status,
+                    error.message,
+                    "error"
+                );
+
             }
 
-            return;
         }
+    );
 
-        if (pitchMessage) {
-            pitchMessage.textContent =
-                "Publishing pitch...";
-        }
-
-        try {
-
-            const data =
-                await apiRequest("/api/pitches", {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
-
-            if (pitchMessage) {
-                pitchMessage.textContent =
-                    data.message ||
-                    "Pitch created successfully.";
-            }
-
-            pitchForm.reset();
-
-            await loadMyPitches();
-
-            const pitchCount =
-                document.getElementById("pitchCount");
-
-            if (pitchCount) {
-
-                const current =
-                    parseInt(pitchCount.textContent) || 0;
-
-                pitchCount.textContent = current + 1;
-            }
-
-        } catch (error) {
-
-            console.error("Pitch creation:", error);
-
-            if (pitchMessage) {
-                pitchMessage.textContent =
-                    error.message || "Failed to create pitch.";
-            }
-        }
-    });
 }
+
 
 /* =========================================================
    MY PITCHES
@@ -770,395 +1535,1503 @@ if (pitchForm) {
 async function loadMyPitches() {
 
     const container =
-        document.getElementById("myPitches");
+        $("myPitches");
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
     try {
 
         const data =
-            await apiRequest("/api/pitches/my");
+            await apiRequest(
+                "/api/pitches/my"
+            );
 
         const pitches =
             data.pitches ||
             data.data ||
             [];
 
-        container.innerHTML = "";
+        const count =
+            $("pitchCount");
 
-        const pitchCount =
-            document.getElementById("pitchCount");
-
-        if (pitchCount) {
-            pitchCount.textContent = pitches.length;
+        if (count) {
+            count.textContent =
+                pitches.length;
         }
 
         if (!pitches.length) {
 
             container.innerHTML = `
                 <div class="empty-state">
-                    You haven't created any pitches yet.
+                    <div>◫</div>
+                    <h3>No pitches yet.</h3>
+                    <p>
+                        Create your first pitch to present
+                        your startup to the Delta ecosystem.
+                    </p>
                 </div>
             `;
 
             return;
         }
 
-        pitches.forEach(function (pitch) {
+        container.className = "pitches-grid";
 
-            const card =
-                document.createElement("div");
+        container.innerHTML =
+            pitches.map(pitch => `
 
-            card.className = "content-card";
+                <article class="pitch-card">
 
-            card.innerHTML = `
-                <h3>${escapeHTML(pitch.title || "Untitled Pitch")}</h3>
-                <p>${escapeHTML(
-                    pitch.description ||
-                    "No description available."
-                )}</p>
-                <div class="meta">
-                    ${escapeHTML(pitch.industry || "General")}
-                    ${pitch.stage ? " • " + escapeHTML(pitch.stage) : ""}
-                    ${pitch.status ? " • " + escapeHTML(pitch.status) : ""}
-                </div>
-            `;
+                    <h3>
+                        ${escapeHTML(
+                            pitch.title ||
+                            "Untitled Pitch"
+                        )}
+                    </h3>
 
-            container.appendChild(card);
-        });
+                    <p>
+                        ${escapeHTML(
+                            pitch.description ||
+                            "No description provided."
+                        )}
+                    </p>
+
+                    <div class="pitch-meta">
+
+                        <span>
+                            ${escapeHTML(
+                                pitch.industry ||
+                                "Industry"
+                            )}
+                        </span>
+
+                        <span>
+                            ${escapeHTML(
+                                pitch.stage ||
+                                "Stage"
+                            )}
+                        </span>
+
+                        <span>
+                            ${escapeHTML(
+                                pitch.status ||
+                                "Draft"
+                            )}
+                        </span>
+
+                    </div>
+
+                </article>
+
+            `).join("");
 
     } catch (error) {
 
-        console.error("Pitches:", error);
+        console.error(
+            "Pitch loading failed:",
+            error
+        );
 
-        container.innerHTML = `
-            <div class="empty-state">
-                Unable to load pitches right now.
-            </div>
-        `;
     }
+
 }
 
+
 /* =========================================================
-   DISCOVER
+   DISCOVER FOUNDERS
 ========================================================= */
 
 const discoverRole =
-    document.getElementById("discoverRole");
+    $("discoverRole");
 
-if (discoverRole) {
-
-    discoverRole.addEventListener("change", function () {
-        loadDiscover();
-    });
-}
 
 async function loadDiscover() {
 
     const container =
-        document.getElementById("discoverUsers");
+        $("discoverUsers");
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
     const role =
-        discoverRole ? discoverRole.value : "";
-
-    container.innerHTML = `
-        <div class="empty-state">
-            Loading members...
-        </div>
-    `;
+        discoverRole?.value ||
+        "Founder";
 
     try {
 
-        let endpoint = "/api/profiles";
-
-        if (role) {
-            endpoint += `?role=${encodeURIComponent(role)}`;
-        }
-
         const data =
-            await apiRequest(endpoint);
+            await apiRequest(
+                `/api/connections/discover?role=${encodeURIComponent(role)}`
+            );
 
         const users =
-            data.profiles ||
             data.users ||
             data.data ||
             [];
 
-        container.innerHTML = "";
-
-        if (!users.length) {
-
-            container.innerHTML = `
-                <div class="empty-state">
-                    No members found.
-                </div>
-            `;
-
-            return;
-        }
-
-        users.forEach(function (user) {
-
-            const id =
-                user._id ||
-                user.id;
-
-            const card =
-                document.createElement("div");
-
-            card.className = "discover-card";
-
-            card.innerHTML = `
-                <h3>${escapeHTML(user.name || "Member")}</h3>
-                <p>${escapeHTML(user.role || "Member")}</p>
-                <p>${escapeHTML(
-                    user.industry ||
-                    user.startupName ||
-                    ""
-                )}</p>
-                <button
-                    class="btn btn-outline"
-                    onclick="sendConnection('${id}')">
-                    Connect
-                </button>
-            `;
-
-            container.appendChild(card);
-        });
+        renderDiscoverUsers(
+            container,
+            users
+        );
 
     } catch (error) {
 
-        console.error("Discover:", error);
+        console.error(
+            "Discover loading failed:",
+            error
+        );
+
+    }
+
+}
+
+
+if (discoverRole) {
+
+    discoverRole.addEventListener(
+        "change",
+        loadDiscover
+    );
+
+}
+
+
+function renderDiscoverUsers(
+    container,
+    users
+) {
+
+    if (!users.length) {
 
         container.innerHTML = `
             <div class="empty-state">
-                Unable to load members right now.
+                <div>◎</div>
+                <h3>No founders found.</h3>
+                <p>
+                    New founders joining Delta will
+                    appear here.
+                </p>
             </div>
         `;
+
+        return;
     }
+
+    container.className = "discover-grid";
+
+    container.innerHTML =
+        users.map(user => {
+
+            const userId =
+                user._id ||
+                user.id;
+
+            return `
+
+                <article class="discover-card">
+
+                    <div class="discover-card-top">
+
+                        <div class="avatar">
+                            ${initials(user.name)}
+                        </div>
+
+                        <span class="badge">
+                            ${escapeHTML(
+                                user.role || "Founder"
+                            )}
+                        </span>
+
+                    </div>
+
+                    <h3>
+                        ${escapeHTML(
+                            user.name ||
+                            "Founder"
+                        )}
+                    </h3>
+
+                    <div class="role">
+                        ${escapeHTML(
+                            user.email || ""
+                        )}
+                    </div>
+
+                    <p class="discover-bio">
+                        Building the next opportunity
+                        inside the Delta ecosystem.
+                    </p>
+
+                    <button
+                        class="btn btn-outline btn-small btn-full"
+                        onclick="sendConnectionRequest('${escapeHTML(userId)}')"
+                    >
+                        + Connect
+                    </button>
+
+                </article>
+
+            `;
+
+        }).join("");
+
 }
+
 
 /* =========================================================
    CONNECTIONS
 ========================================================= */
 
+async function sendConnectionRequest(userId) {
+
+    if (!userId) return;
+
+    try {
+
+        await apiRequest(
+            `/api/connections/request/${userId}`,
+            {
+                method: "POST"
+            }
+        );
+
+        alert(
+            "Connection request sent."
+        );
+
+        await loadDiscover();
+
+        await loadConnections();
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+window.sendConnectionRequest =
+    sendConnectionRequest;
+
+
 async function loadConnections() {
 
     const container =
-        document.getElementById("connectionsList");
+        $("connectionsList");
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
     try {
 
         const data =
-            await apiRequest("/api/connections");
+            await apiRequest(
+                "/api/connections"
+            );
 
         const connections =
             data.connections ||
             data.data ||
             [];
 
-        container.innerHTML = "";
+        renderConnections(
+            container,
+            connections
+        );
 
-        const connectionCount =
-            document.getElementById("connectionCount");
+        updateConnectionCount(
+            connections
+        );
 
-        if (connectionCount) {
-            connectionCount.textContent =
-                connections.length;
-        }
+    } catch (error) {
 
-        if (!connections.length) {
+        console.error(
+            "Connections loading failed:",
+            error
+        );
+
+    }
+
+}
+
+
+function updateConnectionCount(
+    connections
+) {
+
+    const accepted =
+        connections.filter(
+            item =>
+                item.status === "accepted"
+        );
+
+    const count =
+        $("connectionCount");
+
+    if (count) {
+
+        count.textContent =
+            accepted.length;
+
+    }
+
+}
+
+
+function getOtherConnectionUser(
+    connection
+) {
+
+    const currentId =
+        currentUser?._id ||
+        currentUser?.id;
+
+    const sender =
+        connection.sender;
+
+    const receiver =
+        connection.receiver;
+
+    const senderId =
+        sender?._id ||
+        sender;
+
+    if (String(senderId) === String(currentId)) {
+        return receiver;
+    }
+
+    return sender;
+}
+
+
+function renderConnections(
+    container,
+    connections
+) {
+
+    if (!connections.length) {
+
+        container.innerHTML = `
+            <div class="empty-state">
+                <div>∞</div>
+                <h3>Your network is waiting.</h3>
+                <p>
+                    Discover founders and start building
+                    meaningful connections.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    container.className =
+        "connections-grid";
+
+    container.innerHTML =
+        connections.map(connection => {
+
+            const user =
+                getOtherConnectionUser(
+                    connection
+                );
+
+            const userId =
+                user?._id ||
+                user?.id;
+
+            const status =
+                connection.status;
+
+            let actionHTML = "";
+
+            if (status === "accepted") {
+
+                actionHTML = `
+                    <button
+                        class="btn btn-primary btn-small"
+                        onclick="startConversation('${escapeHTML(userId)}')"
+                    >
+                        Message
+                    </button>
+                `;
+
+            } else if (
+                status === "pending" &&
+                String(
+                    connection.receiver?._id ||
+                    connection.receiver
+                ) === String(
+                    currentUser?._id ||
+                    currentUser?.id
+                )
+            ) {
+
+                actionHTML = `
+                    <button
+                        class="btn btn-primary btn-small"
+                        onclick="acceptConnection('${escapeHTML(connection._id)}')"
+                    >
+                        Accept
+                    </button>
+
+                    <button
+                        class="btn btn-outline btn-small"
+                        onclick="rejectConnection('${escapeHTML(connection._id)}')"
+                    >
+                        Reject
+                    </button>
+                `;
+
+            } else {
+
+                actionHTML = `
+                    <span class="badge">
+                        Pending
+                    </span>
+                `;
+
+            }
+
+            return `
+
+                <article class="connection-card">
+
+                    <div class="avatar">
+                        ${initials(
+                            user?.name ||
+                            "Founder"
+                        )}
+                    </div>
+
+                    <div class="connection-card-info">
+
+                        <strong>
+                            ${escapeHTML(
+                                user?.name ||
+                                "Founder"
+                            )}
+                        </strong>
+
+                        <span>
+                            ${escapeHTML(
+                                user?.role ||
+                                "Founder"
+                            )}
+                        </span>
+
+                    </div>
+
+                    <div class="connection-actions">
+                        ${actionHTML}
+                    </div>
+
+                </article>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* =========================================================
+   ACCEPT / REJECT CONNECTION
+========================================================= */
+
+async function acceptConnection(
+    connectionId
+) {
+
+    try {
+
+        await apiRequest(
+            `/api/connections/${connectionId}/accept`,
+            {
+                method: "PUT"
+            }
+        );
+
+        await loadConnections();
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+
+}
+
+
+async function rejectConnection(
+    connectionId
+) {
+
+    try {
+
+        await apiRequest(
+            `/api/connections/${connectionId}/reject`,
+            {
+                method: "PUT"
+            }
+        );
+
+        await loadConnections();
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+
+}
+
+
+window.acceptConnection =
+    acceptConnection;
+
+window.rejectConnection =
+    rejectConnection;
+
+
+/* =========================================================
+   CONNECTION PREVIEW
+========================================================= */
+
+async function loadConnectionPreview() {
+
+    const container =
+        $("connectionPreview");
+
+    if (!container) return;
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/connections"
+            );
+
+        const connections =
+            data.connections ||
+            [];
+
+        const pending =
+            connections.filter(
+                item =>
+                    item.status === "pending"
+            );
+
+        if (!pending.length) {
 
             container.innerHTML = `
-                <div class="empty-state">
-                    No connections yet.
+                <div class="empty-mini">
+                    No new connection requests.
                 </div>
             `;
 
             return;
         }
 
-        connections.forEach(function (connection) {
+        container.innerHTML =
+            pending
+                .slice(0, 4)
+                .map(connection => {
 
-            const user =
-                connection.user ||
-                connection.otherUser ||
-                connection.receiver ||
-                connection.sender ||
-                connection;
+                    const user =
+                        getOtherConnectionUser(
+                            connection
+                        );
 
-            const card =
-                document.createElement("div");
+                    return `
+                        <div class="request-mini">
 
-            card.className = "content-card";
+                            <div class="avatar avatar-small">
+                                ${initials(
+                                    user?.name ||
+                                    "F"
+                                )}
+                            </div>
 
-            card.innerHTML = `
-                <h3>${escapeHTML(
-                    user.name || "Delta Member"
-                )}</h3>
+                            <div class="request-mini-info">
 
-                <p>${escapeHTML(
-                    user.role || "Member"
-                )}</p>
+                                <strong>
+                                    ${escapeHTML(
+                                        user?.name ||
+                                        "Founder"
+                                    )}
+                                </strong>
 
-                <div class="meta">
-                    ${escapeHTML(
-                        connection.status ||
-                        "Connected"
-                    )}
-                </div>
-            `;
+                                <span>
+                                    wants to connect
+                                </span>
 
-            container.appendChild(card);
-        });
+                            </div>
+
+                        </div>
+                    `;
+
+                })
+                .join("");
 
     } catch (error) {
 
-        console.error("Connections:", error);
+        console.error(error);
 
-        container.innerHTML = `
-            <div class="empty-state">
-                Unable to load connections right now.
-            </div>
-        `;
     }
+
 }
 
+
 /* =========================================================
-   SEND CONNECTION
+   MESSAGES
 ========================================================= */
 
-async function sendConnection(userId) {
+async function loadConversations() {
 
-    if (!userId) {
-        return;
-    }
+    const container =
+        $("conversationItems");
+
+    if (!container) return;
 
     try {
 
         const data =
-            await apiRequest("/api/connections", {
-                method: "POST",
-                body: JSON.stringify({
-                    userId
-                })
-            });
+            await apiRequest(
+                "/api/messages/conversations"
+            );
 
-        alert(
-            data.message ||
-            "Connection request sent successfully."
+        const conversations =
+            data.conversations ||
+            data.data ||
+            [];
+
+        renderConversations(
+            container,
+            conversations
         );
-
-        loadConnections();
 
     } catch (error) {
 
-        console.error("Connection:", error);
+        console.error(
+            "Conversation loading failed:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="empty-mini">
+                Connect with a founder to start messaging.
+            </div>
+        `;
+
+    }
+
+}
+
+
+function renderConversations(
+    container,
+    conversations
+) {
+
+    if (!conversations.length) {
+
+        container.innerHTML = `
+            <div class="empty-mini">
+                No conversations yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        conversations.map(conversation => {
+
+            const other =
+                conversation.otherUser ||
+                conversation.user ||
+                conversation.participant;
+
+            const conversationId =
+                conversation._id ||
+                conversation.id;
+
+            return `
+                <div
+                    class="conversation-item"
+                    onclick="openConversation('${escapeHTML(conversationId)}')"
+                >
+
+                    <div class="avatar avatar-small">
+                        ${initials(
+                            other?.name ||
+                            "Founder"
+                        )}
+                    </div>
+
+                    <div class="conversation-info">
+
+                        <strong>
+                            ${escapeHTML(
+                                other?.name ||
+                                "Founder"
+                            )}
+                        </strong>
+
+                        <span>
+                            ${escapeHTML(
+                                conversation.lastMessage?.content ||
+                                conversation.lastMessage ||
+                                "Start a conversation"
+                            )}
+                        </span>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+
+}
+
+
+async function startConversation(
+    userId
+) {
+
+    if (!userId) return;
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/messages/conversations",
+                {
+                    method: "POST",
+
+                    body: JSON.stringify({
+                        userId
+                    })
+                }
+            );
+
+        const conversation =
+            data.conversation ||
+            data.data;
+
+        showDashboardSection(
+            "messages"
+        );
+
+        if (conversation?._id) {
+
+            await openConversation(
+                conversation._id
+            );
+
+        }
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+
+}
+
+
+window.startConversation =
+    startConversation;
+
+
+async function openConversation(
+    conversationId
+) {
+
+    if (!conversationId) return;
+
+    selectedConversation =
+        conversationId;
+
+    const chatPanel =
+        $("activeChat");
+
+    const emptyState =
+        $("chatEmptyState");
+
+    if (emptyState) {
+        emptyState.classList.add("hidden");
+    }
+
+    if (chatPanel) {
+        chatPanel.classList.remove("hidden");
+    }
+
+    await loadMessages(
+        conversationId
+    );
+
+}
+
+
+window.openConversation =
+    openConversation;
+
+
+async function loadMessages(
+    conversationId
+) {
+
+    const container =
+        $("messageList");
+
+    if (!container) return;
+
+    try {
+
+        const data =
+            await apiRequest(
+                `/api/messages/conversations/${conversationId}`
+            );
+
+        const messages =
+            data.messages ||
+            data.data ||
+            [];
+
+        renderMessages(
+            container,
+            messages
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Messages loading failed:",
+            error
+        );
+
+    }
+
+}
+
+
+function renderMessages(
+    container,
+    messages
+) {
+
+    if (!messages.length) {
+
+        container.innerHTML = `
+            <div class="empty-mini">
+                Start the conversation.
+            </div>
+        `;
+
+        return;
+    }
+
+    const currentId =
+        currentUser?._id ||
+        currentUser?.id;
+
+    container.innerHTML =
+        messages.map(message => {
+
+            const senderId =
+                message.sender?._id ||
+                message.sender;
+
+            const mine =
+                String(senderId) ===
+                String(currentId);
+
+            return `
+                <div
+                    class="message-bubble ${
+                        mine ? "mine" : ""
+                    }"
+                >
+
+                    ${escapeHTML(
+                        message.content ||
+                        message.text ||
+                        ""
+                    )}
+
+                    <span class="message-time">
+                        ${formatDate(
+                            message.createdAt
+                        )}
+                    </span>
+
+                </div>
+            `;
+
+        }).join("");
+
+    container.scrollTop =
+        container.scrollHeight;
+
+}
+
+
+/* =========================================================
+   SEND MESSAGE
+========================================================= */
+
+const messageForm =
+    $("messageForm");
+
+
+if (messageForm) {
+
+    messageForm.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+            if (!selectedConversation) {
+
+                return;
+
+            }
+
+            const input =
+                $("messageInput");
+
+            const content =
+                input?.value.trim();
+
+            if (!content) return;
+
+            try {
+
+                await apiRequest(
+                    `/api/messages/conversations/${selectedConversation}`,
+                    {
+                        method: "POST",
+
+                        body: JSON.stringify({
+                            content
+                        })
+                    }
+                );
+
+                input.value = "";
+
+                await loadMessages(
+                    selectedConversation
+                );
+
+            } catch (error) {
+
+                alert(error.message);
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   GROUPS
+========================================================= */
+
+async function loadGroups() {
+
+    const container =
+        $("groupsGrid");
+
+    if (!container) return;
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/groups"
+            );
+
+        const groups =
+            data.groups ||
+            data.data ||
+            [];
+
+        renderGroups(
+            container,
+            groups
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Groups loading failed:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="empty-state">
+                <div>◈</div>
+                <h3>Founder groups are coming.</h3>
+                <p>
+                    Create focused communities around
+                    startups, industries and ideas.
+                </p>
+            </div>
+        `;
+
+    }
+
+}
+
+
+function renderGroups(
+    container,
+    groups
+) {
+
+    if (!groups.length) {
+
+        container.innerHTML = `
+            <div class="empty-state">
+                <div>◈</div>
+                <h3>No groups yet.</h3>
+                <p>
+                    Be one of the first founders to
+                    create a Delta community.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        groups.map(group => {
+
+            const groupId =
+                group._id ||
+                group.id;
+
+            return `
+                <article class="group-card">
+
+                    <div class="group-card-icon">
+                        ◈
+                    </div>
+
+                    <span class="group-category">
+                        ${escapeHTML(
+                            group.category ||
+                            "FOUNDER COMMUNITY"
+                        )}
+                    </span>
+
+                    <h3>
+                        ${escapeHTML(
+                            group.name ||
+                            "Delta Group"
+                        )}
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(
+                            group.description ||
+                            "A community for founders."
+                        )}
+                    </p>
+
+                    <div class="group-meta">
+
+                        <span>
+                            ${group.memberCount || 0}
+                            members
+                        </span>
+
+                    </div>
+
+                    <button
+                        class="btn btn-outline btn-small btn-full"
+                        onclick="joinGroup('${escapeHTML(groupId)}')"
+                    >
+                        Join Group
+                    </button>
+
+                </article>
+            `;
+
+        }).join("");
+
+}
+
+
+async function loadGroupPreview() {
+
+    const container =
+        $("groupPreview");
+
+    if (!container) return;
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/groups"
+            );
+
+        const groups =
+            data.groups ||
+            [];
+
+        if (!groups.length) {
+
+            container.innerHTML = `
+                <div class="empty-mini">
+                    No founder groups yet.
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML =
+            groups.slice(0, 3)
+                .map(group => `
+                    <div class="request-mini">
+
+                        <div class="group-symbol">
+                            ◈
+                        </div>
+
+                        <div class="request-mini-info">
+
+                            <strong>
+                                ${escapeHTML(
+                                    group.name
+                                )}
+                            </strong>
+
+                            <span>
+                                ${group.memberCount || 0}
+                                members
+                            </span>
+
+                        </div>
+
+                    </div>
+                `)
+                .join("");
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+async function joinGroup(groupId) {
+
+    try {
+
+        await apiRequest(
+            `/api/groups/${groupId}/join`,
+            {
+                method: "POST"
+            }
+        );
 
         alert(
-            error.message ||
-            "Unable to send connection request."
+            "You joined the group."
         );
+
+        await loadGroups();
+
+    } catch (error) {
+
+        alert(error.message);
+
     }
+
 }
+
+
+window.joinGroup =
+    joinGroup;
+
+
+/* =========================================================
+   CREATE GROUP
+========================================================= */
+
+const createGroupForm =
+    $("createGroupForm");
+
+
+if (createGroupForm) {
+
+    createGroupForm.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+            const status =
+                $("groupStatus");
+
+            const payload = {
+                name:
+                    $("groupName")?.value.trim() || "",
+
+                category:
+                    $("groupCategory")?.value.trim() || "",
+
+                description:
+                    $("groupDescription")?.value.trim() || ""
+            };
+
+            try {
+
+                showMessage(
+                    status,
+                    "Creating group..."
+                );
+
+                await apiRequest(
+                    "/api/groups",
+                    {
+                        method: "POST",
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                createGroupForm.reset();
+
+                showMessage(
+                    status,
+                    "Group created successfully.",
+                    "success"
+                );
+
+                await loadGroups();
+
+            } catch (error) {
+
+                showMessage(
+                    status,
+                    error.message,
+                    "error"
+                );
+
+            }
+
+        }
+    );
+
+}
+
 
 /* =========================================================
    LOGOUT
 ========================================================= */
 
 const logoutButton =
-    document.getElementById("logoutButton");
+    $("logoutButton");
+
+
+function logout() {
+
+    localStorage.removeItem(
+        "deltaToken"
+    );
+
+    localStorage.removeItem(
+        "deltaUser"
+    );
+
+    currentUser = null;
+    currentProfile = null;
+    currentStartup = null;
+    selectedConversation = null;
+
+    hideElement(dashboardPage);
+
+    showElement(landingPage);
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
 
 if (logoutButton) {
 
-    logoutButton.addEventListener("click", function () {
+    logoutButton.addEventListener(
+        "click",
+        logout
+    );
 
-        localStorage.removeItem("deltaToken");
-        localStorage.removeItem("deltaUser");
-
-        if (dashboardPage) {
-            dashboardPage.classList.add("hidden");
-            dashboardPage.style.display = "none";
-        }
-
-        if (landingPage) {
-            landingPage.classList.remove("hidden");
-            landingPage.style.display = "";
-        }
-
-        if (footer) {
-            footer.classList.remove("hidden");
-        }
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    });
 }
+
 
 /* =========================================================
-   HELPERS
+   DATE FORMAT
 ========================================================= */
 
-function getValue(id) {
+function formatDate(date) {
 
-    const element =
-        document.getElementById(id);
+    if (!date) return "";
 
-    return element
-        ? element.value.trim()
-        : "";
-}
+    const value =
+        new Date(date);
 
-function escapeHTML(value) {
-
-    if (value === null || value === undefined) {
+    if (Number.isNaN(value.getTime())) {
         return "";
     }
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    const now =
+        new Date();
+
+    const seconds =
+        Math.floor(
+            (now - value) / 1000
+        );
+
+    if (seconds < 60) {
+        return "just now";
+    }
+
+    if (seconds < 3600) {
+        return `${Math.floor(seconds / 60)}m`;
+    }
+
+    if (seconds < 86400) {
+        return `${Math.floor(seconds / 3600)}h`;
+    }
+
+    if (seconds < 604800) {
+        return `${Math.floor(seconds / 86400)}d`;
+    }
+
+    return value.toLocaleDateString(
+        "en-IN",
+        {
+            day: "numeric",
+            month: "short"
+        }
+    );
+
 }
 
+
+function capitalize(
+    value
+) {
+
+    return value.charAt(0).toUpperCase()
+        + value.slice(1);
+
+}
+
+
 /* =========================================================
-   CLOSE MODAL WITH ESCAPE
+   QUICK ACTIONS
 ========================================================= */
 
-document.addEventListener("keydown", function (event) {
+document
+    .querySelectorAll("[data-open-section]")
+    .forEach(button => {
 
-    if (event.key === "Escape") {
-        closeJoin();
-    }
-});
+        button.addEventListener(
+            "click",
+            () => {
+
+                const section =
+                    button.dataset.openSection;
+
+                if (section) {
+
+                    showDashboardSection(
+                        section
+                    );
+
+                }
+
+            }
+        );
+
+    });
+
 
 /* =========================================================
-   RESTORE SESSION
+   SESSION RESTORE
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
 
-    const token =
-        localStorage.getItem("deltaToken");
+        const token =
+            getToken();
 
-    const user =
-        getCurrentUser();
+        const storedUser =
+            getStoredUser();
 
-    if (token && user) {
-        openDashboard();
+        if (
+            token &&
+            storedUser
+        ) {
+
+            currentUser =
+                storedUser;
+
+            try {
+
+                await openDashboard();
+
+            } catch (error) {
+
+                console.error(
+                    "Session restore failed:",
+                    error
+                );
+
+            }
+
+        }
+
     }
-});
+);
+
+
+/* =========================================================
+   CLOSE MODAL WITH ESC
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            authModal &&
+            !authModal.classList.contains("hidden")
+        ) {
+
+            closeJoin();
+
+        }
+
+    }
+);
