@@ -93,6 +93,7 @@ app.use("/api/connections", connectionRoutes);
 app.use("/api/startups", startupRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/groups", groupRoutes);
 
 
 // ================= 404 =================
