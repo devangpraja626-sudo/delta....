@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const pitchRoutes = require("./routes/pitchRoutes");
 const connectionRoutes = require("./routes/connectionRoutes");
+const startupRoutes = require("./routes/startupRoutes");
 
 const app = express();
 
